@@ -91,7 +91,7 @@ jQuery is required for now, for XHR-based operations. This dependency requiremen
 
 ## Future intentions
 
-A streamlined interface for all common RESTful HTTP methods is intended and expected to be tested. Hopefully xio.js as it is already implemented will serve as useful for basic local CRUD operations.
+As has been briefly conceptualized already, a streamlined interface for all common RESTful HTTP methods is intended and expected to be tested. Hopefully xio.js as it is already implemented will serve as useful for basic local CRUD and HTTP GET operations.
 
 ## Side notes
 

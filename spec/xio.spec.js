@@ -200,47 +200,32 @@ describe("xio", function() {
                 expect(result).not.toContain(encodeURIComponent(key) + "=" + encodeURIComponent(value));
             });
         });
+    });
 
-        ////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////
 
-        describe("xio.defineRoute()", function() {
-            it("should allow me to define a route", function() {
-                xio.define("fakeroute", {
-                    url: "ignore/this",
-                    methods: [xio.verbs.get]
-                });
+    describe("xio.defineRoute()", function() {
+        it("should allow me to define a route", function() {
+            xio.define("fakeroute", {
+                url: "ignore/this",
+                methods: [xio.verbs.get]
             });
         });
+    });
 
-        ////////////////////////////////////////////////////////////////////////
-
-        describe("xio.get.xhr", function() {
-
-            it("synchronous should return data from a route", function() {
-                var v = xio.verbs;
-                xio.define("sampledata", {
-                    url: "spec/res/get.json",
-                    methods: [v.get],
-                    async: false
-                });
-                var result = xio.get.sampledata()(); // synchronous
-                expect(result).not.toBeFalsy();
-                expect(result.first).not.toBeFalsy();
-                expect(result.last).not.toBeFalsy();
-            });
-        });
-
+    ////////////////////////////////////////////////////////////////////////
+    describe("xhr", function() {
         describe("xio.get.xhr async", function() {
 
-            it("should return data from a route", function() {
+            it("should return data from a route 2", function() {
                 var v = xio.verbs;
-                xio.define("sampledata2", {
-                    url: "spec/res/get.json",
+                xio.define("resources", {
+                    url: "spec/res/{0}",
                     methods: [v.get],
                     dataType: 'json'
                 });
                 var result;
-                xio.get.sampledata2().success(function(v) {
+                xio.get.resources().success(function(v) {
                     result = v;
                 }).complete(function() {
                     expect(result).not.toBeFalsy();
@@ -250,5 +235,21 @@ describe("xio", function() {
             });
         });
 
+        describe("xio.get.xhr", function() {
+
+            it("synchronous should return data from a route", function() {
+                var v = xio.verbs;
+                xio.define("synchronous_resources", {
+                    url: "spec/res/{0}",
+                    methods: [v.get],
+                    async: false // synchronous
+                });
+                var result = xio.get.synchronous_resources("get.json")();
+                expect(result).not.toBeFalsy();
+                expect(result.first).not.toBeFalsy();
+                expect(result.last).not.toBeFalsy();
+            });
+        });
     });
+
 });

@@ -180,12 +180,23 @@
         }
     }
 
+    function strprepad(n,w,c) { 
+        n=n.toString();
+        while (n.length < w) n = c + n;
+        return n;
+    }
+
     function createRoutedHandler(verb, definition) {
 
-        return function() {
+        return function(formatters) {
+
             var options = definition || {};
             var url = definition.url;
-            if (options.url) url = options.url;
+            if (/\{\d+\}/.test(url)) {
+                for (var i=0; i<arguments.length; i++) {
+                    url = url.replace(new RegExp("\\{" + (i) + "\\}", 'g'), arguments[i]);
+                }
+            }
             var method = verb;
 
 

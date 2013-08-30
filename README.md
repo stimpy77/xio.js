@@ -34,29 +34,29 @@ xio.js is a library that enables you to read and write data to/from data stores 
     var val = xio.get.cookie("my_key")();
     xio.delete.cookie("my_key");
 
-#### web server resource (synchronous GET)
-
-    xio.define("sampledata2", {
-                    url: "spec/res/get.json",
-                    methods: [xio.verbs.get],
-                    dataType: 'json',
-                    async: false
-                });
-    var val = xio.get.sampledata2()();
-
 #### web server resource (asynchronous GET)
 
-    xio.define("sampledata2", {
-                    url: "spec/res/get.json",
+    xio.define("specresource", {
+                    url: "spec/res/{0}",
                     methods: [xio.verbs.get],
                     dataType: 'json'
                 });
     var val;
-    xio.get.sampledata2().success(v) {
+    xio.get.specresource("myresource").success(v) {
         val = v;
     }).complete(function() {
         // continue processing with populated val
     });
+
+#### web server resource (synchronous GET)
+
+    xio.define("synchronous_specresources", {
+                    url: "spec/res/{0}",
+                    methods: [xio.verbs.get],
+                    dataType: 'json',
+                    async: false
+                });
+    var val = xio.get.synchronous_specresources("myResource")();
 
 
 ## Dependencies
@@ -66,3 +66,7 @@ jQuery is required for now, for XHR-based operations. This dependency requiremen
 ## Future intentions
 
 A streamlined interface for all common RESTful HTTP methods is intended and expected to be tested. Hopefully xio.js as it is already implemented will serve as useful for basic local CRUD operations.
+
+## Side notes
+
+If you run the Jasmine tests, make sure the .json file type is set up as a mime type. IIS Express will return a 403 otherwise. Google reveals this: http://michaellhayden.blogspot.com/2012/07/add-json-mime-type-to-iis-express.html

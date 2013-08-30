@@ -1,4 +1,4 @@
-# xio.js
+xio.js
 ======
 version 0.0.1
 

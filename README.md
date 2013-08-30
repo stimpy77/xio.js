@@ -37,7 +37,7 @@ See xio.verbs:
 
     xio.set.cookie(...)
 	
-.. supports these arguments: (key, value, expires, path, domain)
+.. supports these arguments: `(key, value, expires, path, domain)`
 
 Alternatively, retaining only the `xio.set[target](key, value)`, you can automatically returned helper replacer functions:
 

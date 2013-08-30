@@ -95,4 +95,4 @@ A streamlined interface for all common RESTful HTTP methods is intended and expe
 
 ## Side notes
 
-If you run the Jasmine tests, make sure the .json file type is set up as a mime type. IIS Express will return a 403 otherwise. Google reveals this: http://michaellhayden.blogspot.com/2012/07/add-json-mime-type-to-iis-express.html
+If you run the Jasmine tests, make sure the .json file type is set up as a mime type. For example, IIS and IIS Express will return a 403 otherwise. Google reveals this: http://michaellhayden.blogspot.com/2012/07/add-json-mime-type-to-iis-express.html

@@ -1,5 +1,5 @@
 # xio.js
-## version 0.0.1
+version 0.0.1
 ======
 
 A consistent data CRUD API strategy for local and remote resources.

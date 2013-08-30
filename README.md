@@ -80,7 +80,7 @@ Note that using this approach, while more expressive and potentially more conver
                     url: "spec/res/{0}",
                     methods: [xio.verbs.get],
                     dataType: 'json',
-                    async: false
+                    async: false // <<!!!!!
                 });
     var val = xio.get.synchronous_specresources("myResourceAction")(); // gets http://host_server/spec/res/myResourceAction
 

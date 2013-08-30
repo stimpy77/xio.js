@@ -68,7 +68,7 @@ Note that using this approach, while more expressive and potentially more conver
                     dataType: 'json'
                 });
     var val;
-    xio.get.specresource("myResourceAction").success(v) { // gets http://host_server/spec/res/myResourceAction
+    xio.get.specresource("myResourceAction").success(function(v) { // gets http://host_server/spec/res/myResourceAction
         val = v;
     }).complete(function() {
         // continue processing with populated val

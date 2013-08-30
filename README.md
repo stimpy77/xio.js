@@ -42,7 +42,7 @@ xio.js is a library that enables you to read and write data to/from data stores 
                     dataType: 'json'
                 });
     var val;
-    xio.get.specresource("myresource").success(v) {
+    xio.get.specresource("myResourceAction").success(v) { // gets http://host_server/spec/res/myResourceAction
         val = v;
     }).complete(function() {
         // continue processing with populated val
@@ -56,7 +56,7 @@ xio.js is a library that enables you to read and write data to/from data stores 
                     dataType: 'json',
                     async: false
                 });
-    var val = xio.get.synchronous_specresources("myResource")();
+    var val = xio.get.synchronous_specresources("myResourceAction")(); // gets http://host_server/spec/res/myResourceAction
 
 
 ## Dependencies

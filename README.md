@@ -8,6 +8,15 @@ A consistent data CRUD API strategy for local and remote resources.
 
 xio.js is a library that enables you to read and write data to/from data stores and remote servers using a consistent interface. It enables you to write code that can be more easily migrated between storage locations and/or URIs.
 
+### Basic verbs
+
+- get
+- set (used only by localStorage, sessionStorage, and cookie)
+- put (defaults to "set" behavior when using localStorage, sessionStorage, or cookie)
+- post (defaults to "set" behavior when using localStorage, sessionStorage, or cookie)
+- delete
+- et al; HTTP verbs would apply
+
 ### Examples
 
 #### localStorage
@@ -21,14 +30,20 @@ xio.js is a library that enables you to read and write data to/from data stores 
     xio.set.session("my_key", "my_value");
     var val = xio.get.session("my_key")();
     xio.delete.session("my_key");
+	
+#### cookie
+
+    xio.set.cookie(...)
+	
+.. supports these arguments: (key, value, expires, path, domain)
   
-#### session cookie
+##### session cookie
 
     xio.set.cookie("my_key", "my_value");
     var val = xio.get.cookie("my_key")();
     xio.delete.cookie("my_key");
 
-#### persistent cookie
+##### persistent cookie
 
     xio.set.cookie("my_key", "my_value", new Date(Date.now() + 30 * 24 * 60 * 60000));
     var val = xio.get.cookie("my_key")();

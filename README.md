@@ -46,7 +46,7 @@ Alternatively, retaining only the `xio.set[target](key, value)`, you can automat
         .path("/")
         .domain("mysite.com");
 
-Note that using this approach, while more expressive, also results in each helper function deleting the previous value to set the value with the new adjustment.
+Note that using this approach, while more expressive and potentially more convertible to other CRUD targets, also results in each helper function deleting the previous value to set the value with the new adjustment.
   
 ##### session cookie
 

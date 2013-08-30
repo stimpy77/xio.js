@@ -10,6 +10,8 @@ xio.js is a library that enables you to read and write data to/from data stores 
 
 ### Basic verbs
 
+See xio.verbs:
+
 - get
 - set (used only by localStorage, sessionStorage, and cookie)
 - put (defaults to "set" behavior when using localStorage, sessionStorage, or cookie)
@@ -36,6 +38,15 @@ xio.js is a library that enables you to read and write data to/from data stores 
     xio.set.cookie(...)
 	
 .. supports these arguments: (key, value, expires, path, domain)
+
+Alternatively, retaining only the xio.set[target](key, value), you can automatically returned helper replacer functions:
+
+    xio.set[target](skey, svalue)
+        .expires(Date.now() + 30 * 24 * 60 * 60000))
+        .path("/")
+        .domain("mysite.com");
+
+Note that using this approach, while more expressive, also results in each helper function deleting the previous value to set the value with the new adjustment.
   
 ##### session cookie
 

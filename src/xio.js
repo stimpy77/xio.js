@@ -151,19 +151,19 @@
     }
 
     var verbHandles = {
-        put: putDefinitions,
-        set: setDefinitions,
-        get: getDefinitions,
-        delete: deleteDefinitions
+        "put": putDefinitions,
+        "set": setDefinitions,
+        "get": getDefinitions,
+        "delete": deleteDefinitions
     };
 
     // routing and actions
     var verbs = {
-        get: "GET",
-        post: "POST",
-        put: "PUT",
-        delete: "DELETE",
-        patch: "PATCH"
+        "get": "GET",
+        "post": "POST",
+        "put": "PUT",
+        "delete": "DELETE",
+        "patch": "PATCH"
         // etc etc
     };
     var defineRoute = function(name, definition) {
@@ -220,16 +220,16 @@
     this.xio = {
 
         // action implementations
-        get: getDefinitions,
-        post: postDefinitions,
-        put: putDefinitions,
-        set: setDefinitions,
-        delete: deleteDefinitions,
+        "get": getDefinitions,
+        "post": postDefinitions,
+        "put": putDefinitions,
+        "set": setDefinitions,
+        "delete": deleteDefinitions,
 
-        define: defineRoute,
+        "define": defineRoute,
 
         // reference
-        verbs: verbs
+        "verbs": verbs
     };
 
 })(jQuery);

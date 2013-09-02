@@ -225,7 +225,7 @@ describe("xio", function() {
                     dataType: 'json'
                 });
                 var result;
-                xio.get.resources().success(function(v) {
+                xio.get.resources("get.json").success(function(v) {
                     result = v;
                 }).complete(function() {
                     expect(result).not.toBeFalsy();

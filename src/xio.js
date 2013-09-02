@@ -8,7 +8,9 @@
     }
     function localGetDefinition(key) {
         var result = localStorage.getItem(key);
-        return synchronousPromiseResult({success: function(callback) {callback.call(this, result)}});
+        return result !== undefined && result !== null
+            ? synchronousPromiseResult({ success: function (callback) { callback.call(this, result); } })
+            : synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });
     }
 
     function localDeleteDefinition(key) {
@@ -23,7 +25,10 @@
     }
 
     function sessionGetDefinition(key) {
-        return synchronousPromiseResult({success: function(callback) {callback.call(this, sessionStorage.getItem(key))}});
+        var result = sessionStorage.getItem(key);
+        return result !== undefined && result !== null
+            ? synchronousPromiseResult({ success: function (callback) { callback.call(this, result); } })
+            : synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });
     }
 
     function sessionDeleteDefinition(key) {
@@ -75,7 +80,7 @@
                 cookieDeleteDefinition(key, path, domain);
                 return cookieSetDefinition(key, value, expires, path, vdomain);
             }
-        }
+        };
     }
 
     function cookieDeleteDefinition(key, path, domain) {
@@ -85,16 +90,20 @@
     function cookieGetDefinition(key) {
         // from mozilla (!!)
         var ret = decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(key).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
-        return synchronousPromiseResult({success: function(callback) {callback.call(this, ret); } });
+        return ret
+            ? synchronousPromiseResult({ success: function(callback) { callback.call(this, ret); } })
+            : synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });
     }
 
-    function synchronousPromiseResult(promise) {
+    function synchronousPromiseResult(promise) { // bit of a hack to make synchronous operations appear asynchronous
         promise = promise || {};
-        promise.success = promise.success || function() {};
-        var ret = function() {
+        promise.success = promise.success || nocall;
+        var ret;
+        ret = function() {
             var result;
             promise.success(function(value) {
                 result = value;
+                return ret;
             });
             if (result === undefined && promise.readyState === 4) {
                 switch (promise.getResponseHeader("Content-Type")) {
@@ -108,10 +117,22 @@
             }
             return result;
         };
-        ret.success = promise.success;
-        ret.done = promise.done || function() {};
-        ret.fail = promise.fail || function() {};
-        ret.always = promise.always || function() {};
+        var autocall = function (callback) { callback.call(this); return ret; }; // execute and return my psuedo-promise; also, this?
+        var nocall = function () { return ret; }; // do nothing and return my pseudo-promise
+        var wrapcall = function(callee) { // wrap the promise's handler to return my psuedo-promise
+            return callee
+                ? function(usercallback) {
+                    callee.call(this, usercallback); // this?
+                    return ret;
+                }
+                : null;
+        };
+        ret.success = wrapcall(promise.success) || nocall;
+        ret.error = wrapcall(promise.error) || nocall;
+        ret.fail = wrapcall(promise.fail) || wrapcall(promise.error) || nocall;
+        ret.done = wrapcall(promise.done) || autocall;
+        ret.always = wrapcall(promise.always) || autocall;
+        ret.complete = ret.always;
         return ret;
     }
 
@@ -127,7 +148,7 @@
         local: localSetDefinition,
         session: sessionSetDefinition,
         cookie: cookieSetDefinition
-    }
+    };
 
     // set
     var setDefinitions = {
@@ -141,20 +162,21 @@
         local: localGetDefinition,
         session: sessionGetDefinition,
         cookie: cookieGetDefinition
-    }
+    };
 
     // delete
     var deleteDefinitions = {
         local: localDeleteDefinition,
         session: sessionDeleteDefinition,
         cookie: cookieDeleteDefinition
-    }
+    };
 
     var verbHandles = {
         "put": putDefinitions,
         "set": setDefinitions,
         "get": getDefinitions,
-        "delete": deleteDefinitions
+        "delete": deleteDefinitions,
+        "post": postDefinitions
     };
 
     // routing and actions
@@ -186,17 +208,24 @@
         return n;
     }
 
+    function formatString(str, formatters) {
+        if (/\{\d+\}/.test(str)) {
+            for (var i = 1; i < arguments.length; i++) {
+                str = str.replace(new RegExp("\\{" + (i-1) + "\\}", 'g'), arguments[i]);
+            }
+        }
+        return str;
+    }
+
+
     function createRoutedHandler(verb, definition) {
 
-        return function(formatters) {
+        return function(key, data) {
 
             var options = definition || {};
             var url = definition.url;
-            if (/\{\d+\}/.test(url)) {
-                for (var i=0; i<arguments.length; i++) {
-                    url = url.replace(new RegExp("\\{" + (i) + "\\}", 'g'), arguments[i]);
-                }
-            }
+            var args = [url, key];
+            url = formatString.apply(null, args);
             var method = verb;
 
 
@@ -204,11 +233,15 @@
             // jquery implementation (todo: drop jquery dependency)
             var jqoptions = {};
             for (var p in options) {
-                if (options.hasOwnProperty(p)) {
+                if (options.hasOwnProperty(p) && p !== 'url' && p !== 'methods') {
                     jqoptions[p] = options[p];
                 }
             }
             jqoptions.type = method;
+            data = data || jqoptions.data;
+            if (typeof(data) === "string" && data.indexOf("=") == -1) data = "value=" + data;
+            if (typeof(data) === "object") data = JSON.stringify(data);
+            jqoptions.data = data;
             if (options.async === false) {
                 // return immediately
                 var response = $.ajax(url, jqoptions);
@@ -227,6 +260,9 @@
         "delete": deleteDefinitions,
 
         "define": defineRoute,
+        
+        // util
+        "formatString": formatString,
 
         // reference
         "verbs": verbs

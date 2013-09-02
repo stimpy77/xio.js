@@ -47,6 +47,35 @@ describe("xio", function() {
             });
         });
 
+        describe("xio.get.local(k) async pattern via success", function () {
+            it("should retrieve data from localStorage", function () {
+                var key = Date.now().valueOf().toString();
+                var value = "xio localStorage getter works";
+                var fromSource = "local";
+                localStorage.setItem(key, value);
+                var result;
+                xio.get[fromSource](key).success(function (value) { result = value; });
+                if (result) localStorage.removeItem(key); // cleanup
+                expect(result).toBe(value);
+            });
+        });
+
+        describe("xio.get.local(k) async pattern via error", function () {
+            it("should fail to retrieve data from localStorage", function () {
+                var key = Date.now().valueOf().toString();
+                var value = "xio localStorage getter works";
+                var fromSource = "local";
+                //localStorage.setItem(key, value);
+                var result, error, failed;
+                var successResult = xio.get[fromSource](key).success(function (value) { result = value; });
+                successResult.error(function () { error = true; }).fail(function () { failed = true; });
+                if (result) localStorage.removeItem(key); // cleanup
+                expect(result).not.toBe(value);
+                expect(error).toBe(true);
+                expect(failed).toBe(true);
+            });
+        });
+
         describe("xio.delete.local(k)", function() {
             it("should delete data from localStorage", function() {
                 var key = Date.now().valueOf().toString();
@@ -215,9 +244,9 @@ describe("xio", function() {
 
     ////////////////////////////////////////////////////////////////////////
     describe("xhr", function() {
-        describe("xio.get.xhr async", function() {
+        describe("xio.get.xhr", function() {
 
-            it("should return data from a route 2", function() {
+            it("async should return data from a route", function () {
                 var v = xio.verbs;
                 xio.define("resources", {
                     url: "spec/res/{0}",
@@ -233,21 +262,111 @@ describe("xio", function() {
                     expect(result.last).not.toBeFalsy();
                 });
             });
-        });
-
-        describe("xio.get.xhr", function() {
 
             it("synchronous should return data from a route", function() {
                 var v = xio.verbs;
                 xio.define("synchronous_resources", {
-                    url: "spec/res/{0}",
+                    url: "spec/svr/Sample1/{0}",
                     methods: [v.get],
                     async: false // synchronous
                 });
-                var result = xio.get.synchronous_resources("get.json")();
+                var id = "mykey";
+                var result = xio.get.synchronous_resources(id)();
                 expect(result).not.toBeFalsy();
-                expect(result.first).not.toBeFalsy();
-                expect(result.last).not.toBeFalsy();
+                expect(result.name).not.toBeFalsy();
+                expect(result.value).not.toBeFalsy();
+                expect(result.name).toBe(id);
+                expect(result.value).toContain(id);
+            });
+            
+
+            it("multi-key request should return data from a route", function () {
+                var v = xio.verbs;
+                xio.define("multiparam", {
+                    url: "spec/svr/MultiParam/{0}",
+                    methods: [v.get],
+                    async: false // synchronous
+                });
+                var compositeKey = xio.formatString("{0}/{1}/{2}", "a", "b", "c");
+                var result;
+                xio.get.multiparam(compositeKey).success(function (retval) {
+                    result = retval;
+                })
+                .error(function(error) {
+                    result = "error";
+                })
+                    .complete(function () {
+                    expect(result).not.toBeFalsy();
+                    expect(result.param1).toBe("a");
+                    expect(result.param2).toBe("b");
+                    expect(result.param3).toBe("c");
+                });
+            });
+        });
+
+        describe("xio.post.xhr", function () {
+
+            it("should post string to a route", function () {
+                var v = xio.verbs;
+                xio.define("keyvaluestore", {
+                    url: "spec/svr/KeyValueStore/{0}",
+                    methods: [v.get,v.post],
+                    async: false // synchronous
+                });
+                var key = "post1";
+                var value = "val1";
+                var result;
+                xio.post.keyvaluestore(key, value).success(function (retval) {
+                    $.getJSON("spec/svr/KeyValueStore/" + key, function(v) {
+                        result = v;
+                        expect(result).toBe(value);
+                        
+                        // cleanup
+                        $.ajax("spec/svr/KeyValueStore/" + key + "?method=DELETE", {
+                            type: "DELETE"
+                        });
+                    }).fail(function() {
+                        result = "error";
+                        expect(result).not.toBe("error");
+                    });
+
+                })
+                .error(function (error) {
+                    result = "error";
+                    expect(result).not.toBe("error");
+                });
+            });
+
+            it("should post model to a route", function () {
+                var v = xio.verbs;
+                xio.define("keyvaluestore2", {
+                    url: "spec/svr/KeyValueStore/{0}",
+                    methods: [v.get, v.post],
+                    async: false // synchronous
+                });
+                var key = "post2";
+                var model = { akey: "avalue" };
+                var result;
+                xio.post.keyvaluestore2(key, model).success(function (retval) {
+                    $.getJSON("spec/svr/KeyValueStore/" + key, function (v) {
+                        result = v;
+                        expect(result).not.toBeFalsy();
+                        expect(result.akey).toBe("avalue");
+
+                        // cleanup
+                        $.ajax("spec/svr/KeyValueStore/" + key + "?method=DELETE", {
+                            type: "DELETE"
+                        });
+                    }).fail(function () {
+                        result = "error";
+                        expect(result).not.toBe("error");
+                    });
+
+                })
+                .error(function (error) {
+                    result = "error";
+                    expect(result).not.toBe("error");
+                });
             });
         });
     });

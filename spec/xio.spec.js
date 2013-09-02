@@ -341,8 +341,7 @@ describe("xio", function() {
                 var v = xio.verbs;
                 xio.define("keyvaluestore2", {
                     url: "spec/svr/KeyValueStore/{0}",
-                    methods: [v.get, v.post],
-                    async: false // synchronous
+                    methods: [v.get, v.post]
                 });
                 var key = "post2";
                 var model = { akey: "avalue" };

@@ -217,6 +217,12 @@
         return str;
     }
 
+    function stringify(obj) {
+        if (!JSON || !JSON.stringify) {
+            throw "json2.js is required; please reference it.";
+        }
+        JSON.stringify(obj);
+    }
 
     function createRoutedHandler(verb, definition) {
 
@@ -240,7 +246,7 @@
             jqoptions.type = method;
             data = data || jqoptions.data;
             if (typeof(data) === "string" && data.indexOf("=") == -1) data = "value=" + data;
-            if (typeof(data) === "object") data = JSON.stringify(data);
+            if (typeof(data) === "object") data = stringify(data);
             jqoptions.data = data;
             if (options.async === false) {
                 // return immediately

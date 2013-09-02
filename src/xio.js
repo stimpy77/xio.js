@@ -205,7 +205,7 @@
     function formatString(str) {
         if (/\{\d+\}/.test(str)) {
             for (var i = 1; i < arguments.length; i++) {
-                str = str.replace(new RegExp("\\{" + (i-1) + "\\}", 'g'), arguments[i] || "0");
+                str = str.replace(new RegExp("\\{" + (i-1) + "\\}", 'g'), arguments[i] || "");
             }
         }
         return str;

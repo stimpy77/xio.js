@@ -39,12 +39,10 @@ namespace xio.js.spec
             }
 
             // since this key/value store API is being used with either a value or a model,
-            // identify if value and store just the value; 
-            // this is just a local hack for Newtonsoft / JObject
+            // identify if just value as name; this is just a local hack for Newtonsoft / JObject
             if (value.Properties().Count() == 1 && value.Properties().First().Value.ToString() == "")
             {
                 var val = value.Properties().First().Name;
-                if (val.StartsWith("\"") && val.EndsWith("\"")) val = val.Substring(1, val.Length - 2);
                 _values.Add(key, val);
             }
 

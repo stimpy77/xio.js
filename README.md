@@ -84,6 +84,25 @@ Note that using this approach, while more expressive and potentially more conver
                 });
     var val = xio.get.synchronous_specresources("myResourceAction")(); // gets http://host_server/spec/res/myResourceAction
 
+#### web server resource POST
+
+    xio.define("contactsvc", {
+                    url: "svcapi/contact/{0}",
+                    methods: [ xio.verbs.get, xio.verbs.post ],
+                    dataType: 'json'
+                });
+    var myModel = {
+        first: "Fred",
+        last: "Flinstone"
+    }
+    var val = xio.post.contactsvc(null, myModel).success(function(id) { // posts to http://host_server/svcapi/contact
+        // model has been posted, new ID returned
+        // validate:
+        xio.get.contactsvc(id).success(function(contact) { 
+            expect(contact.first).toBe("Fred");
+        });
+    });
+
 
 ## Dependencies
 

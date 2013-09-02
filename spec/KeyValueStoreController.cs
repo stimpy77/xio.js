@@ -29,9 +29,22 @@ namespace xio.js.spec
             }
         }
 
-        public void Post(string key, [FromBody]JObject value)
+        public string Post(string key, [FromBody]JObject value)
         {
-            _values.Add(key, value);
+            // since "0" is an invalid key as is null, treat both as though a new key is needed
+            if (key == null || key == "0")
+            {
+                key = (new Random()).Next(100000000).ToString();
+            
+            }
+            // since this key/value store API is being used with either a value or a model,
+            // identify if value and store just the value
+            if (value.Properties().Count() == 1 && value.Properties().First().Name == "value")
+            {
+                _values.Add(key, value["value"]);
+            }
+            else _values.Add(key, value);
+            return key; // return the key, whether provided or generated
         }
 
         public void Put(string key, object value)

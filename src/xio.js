@@ -200,18 +200,12 @@
                 handlers[name] = createRoutedHandler(actionVerb, definition);
             }
         }
-    }
+    };
 
-    function strprepad(n,w,c) { 
-        n=n.toString();
-        while (n.length < w) n = c + n;
-        return n;
-    }
-
-    function formatString(str, formatters) {
+    function formatString(str) {
         if (/\{\d+\}/.test(str)) {
             for (var i = 1; i < arguments.length; i++) {
-                str = str.replace(new RegExp("\\{" + (i-1) + "\\}", 'g'), arguments[i]);
+                str = str.replace(new RegExp("\\{" + (i-1) + "\\}", 'g'), arguments[i] || "0");
             }
         }
         return str;
@@ -230,7 +224,12 @@
 
             var options = definition || {};
             var url = definition.url;
-            var args = [url, key];
+            var args = [url];
+            if (key === null || typeof(key) == "string") args.push(key);
+            else { // assume array of composite key items for formatter
+                for (var i in key) args.push(key[i]);
+            }
+            
             url = formatString.apply(null, args);
             var method = verb;
 

@@ -343,10 +343,11 @@ describe("xio", function() {
                     url: "spec/svr/KeyValueStore/{0}",
                     methods: [v.get, v.post]
                 });
-                var key = "post2";
+                var key = null; //"post2";
                 var model = { akey: "avalue" };
                 var result;
-                xio.post.keyvaluestore2(key, model).success(function (retval) {
+                xio.post.keyvaluestore2(key, model).success(function (newkey) {
+                    key = newkey;
                     $.getJSON("spec/svr/KeyValueStore/" + key, function (v) {
                         result = v;
                         expect(result).not.toBeFalsy();

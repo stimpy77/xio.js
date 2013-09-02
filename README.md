@@ -98,7 +98,7 @@ Note that using this approach, while more expressive and potentially more conver
     var val = xio.post.contactsvc(null, myModel).success(function(id) { // posts to http://host_server/svcapi/contact/
         // model has been posted, new ID returned
         // validate:
-        xio.get.contactsvc(id).success(function(contact) { 
+        xio.get.contactsvc(id).success(function(contact) {  // gets from http://host_server/svcapi/contact/{id}
             expect(contact.first).toBe("Fred");
         });
     });

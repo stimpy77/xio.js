@@ -32,6 +32,16 @@ See xio.verbs:
     xio.get.local("my_key").success(function(v) 
         val = v;
     });
+
+    // PATCH support!? (todo; not yet implemented)
+    xio.set.local("my_key", {
+        first: "Bob",
+        last: "Jones"
+    }).complete(function() {
+		xio.patch.local("my_key", {
+			last: "Jonas" // keep first name
+		});
+    });
   
 #### sessionStorage
 
@@ -109,6 +119,51 @@ Note that using this approach, while more expressive and potentially more conver
         });
     });
 
+#### web server resource (DELETE) (todo; not yet tested/implemetned)
+
+    xio.delete.myresourceContainer("myresource");
+
+#### web server resource (PUT) (todo; not yet tested/implemetned)
+
+    xio.define("contactsvc", {
+                    url: "svcapi/contact/{0}",
+                    methods: [ xio.verbs.get, xio.verbs.post, xio.verbs.put ],
+                    dataType: 'json'
+                });
+    var myModel = {
+        first: "Fred",
+        last: "Flinstone"
+    }
+    var val = xio.post.contactsvc(null, myModel).success(function(id) { // posts to http://host_server/svcapi/contact/
+        // model has been posted, new ID returned
+        // now modify:
+		myModel = {
+            first: "Carl",
+            last: "Zeuss"
+        }
+        xio.put.contactsvc(id, myModel).success(function() {  /* .. */ }).error(function() { /* .. */ });
+    });
+
+#### web server resource (PATCH) (todo; not yet tested/implemetned)
+
+    xio.define("contactsvc", {
+                    url: "svcapi/contact/{0}",
+                    methods: [ xio.verbs.get, xio.verbs.post, xio.verbs.patch ],
+                    dataType: 'json'
+                });
+    var myModel = {
+        first: "Fred",
+        last: "Flinstone"
+    }
+    var val = xio.post.contactsvc(null, myModel).success(function(id) { // posts to http://host_server/svcapi/contact/
+        // model has been posted, new ID returned
+        // now modify:
+		var myModification = {
+            first: "Phil" // leave the last name intact
+        }
+        xio.patch.contactsvc(id, myModification).success(function() {  /* .. */ }).error(function() { /* .. */ });
+    });
+
 
 ## Dependencies
 
@@ -116,7 +171,7 @@ jQuery is required for now, for XHR-based operations. This dependency requiremen
 
 ## Future intentions
 
-As has been briefly conceptualized already, a streamlined interface for all common RESTful HTTP methods is intended and expected to be tested. Hopefully xio.js as it is already implemented will serve as useful for basic local CRUD and HTTP GET operations.
+HTTP GET and POST have been conceptualized and tested. The DELETE, PUT and PATCH operations are still pending tests. PATCH applied to localStorage given a stringified data model as the stored value could be very interesting and useful so it is also in the queue to be added.
 
 ## Side notes
 

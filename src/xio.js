@@ -221,7 +221,7 @@
         if (!JSON || !JSON.stringify) {
             throw "json2.js is required; please reference it.";
         }
-        JSON.stringify(obj);
+        return JSON.stringify(obj);
     }
 
     function createRoutedHandler(verb, definition) {

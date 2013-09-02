@@ -12,11 +12,11 @@ xio.js is a library that enables you to read and write data to/from data stores 
 
 See xio.verbs:
 
-- get
-- set (used only by localStorage, sessionStorage, and cookie)
-- put (defaults to "set" behavior when using localStorage, sessionStorage, or cookie)
-- post (defaults to "set" behavior when using localStorage, sessionStorage, or cookie)
-- delete
+- get(key)
+- set(key, value); used only by localStorage, sessionStorage, and cookie
+- put(key, data); defaults to "set" behavior when using localStorage, sessionStorage, or cookie
+- post(key, data); defaults to "set" behavior when using localStorage, sessionStorage, or cookie
+- delete(key)
 - et al; HTTP verbs would apply
 
 ### Examples
@@ -26,6 +26,12 @@ See xio.verbs:
     xio.set.local("my_key", "my_value");
     var val = xio.get.local("my_key")();
     xio.delete.local("my_key");
+
+    // or, get using asynchronous conventions, ..    
+    var val;
+    xio.get.local("my_key").success(function(v) 
+        val = v;
+    });
   
 #### sessionStorage
 

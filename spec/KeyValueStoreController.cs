@@ -31,18 +31,23 @@ namespace xio.js.spec
 
         public string Post(string key, [FromBody]JObject value)
         {
-            // since "0" is an invalid key as is null, treat both as though a new key is needed
-            if (key == null || key == "0")
+            // since "0" is an invalid key as is null or empty string, treat both as though a new key is needed
+            if (key == null || key == "0" || key == "")
             {
                 key = (new Random()).Next(100000000).ToString();
             
             }
+
             // since this key/value store API is being used with either a value or a model,
-            // identify if value and store just the value
-            if (value.Properties().Count() == 1 && value.Properties().First().Name == "value")
+            // identify if value and store just the value; 
+            // this is just a local hack for Newtonsoft / JObject
+            if (value.Properties().Count() == 1 && value.Properties().First().Value.ToString() == "")
             {
-                _values.Add(key, value["value"]);
+                var val = value.Properties().First().Name;
+                if (val.StartsWith("\"") && val.EndsWith("\"")) val = val.Substring(1, val.Length - 2);
+                _values.Add(key, val);
             }
+
             else _values.Add(key, value);
             return key; // return the key, whether provided or generated
         }

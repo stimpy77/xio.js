@@ -244,8 +244,8 @@
             }
             jqoptions.type = method;
             data = data || jqoptions.data;
-            if (typeof(data) === "string" && data.indexOf("=") == -1) data = "value=" + data;
-            if (typeof(data) === "object") data = stringify(data);
+            //if (typeof(data) === "string" && data.indexOf("=") == -1) data = "value=" + data;
+            data = stringify(data);
             jqoptions.data = data;
             if (options.async === false) {
                 // return immediately

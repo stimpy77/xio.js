@@ -343,30 +343,31 @@ describe("xio", function() {
                     url: "spec/svr/KeyValueStore/{0}",
                     methods: [v.get, v.post]
                 });
-                var key = 0; //"post2";
+                var key = 0; // hack, would prefer null to generate "" but the server side test doesn't resolve the route
                 var model = { akey: "avalue" };
                 var result;
-                xio.post.keyvaluestore2(key, model).success(function (newkey) {
-                    key = newkey;
-                    $.getJSON("spec/svr/KeyValueStore/" + key, function (v) {
-                        result = v;
-                        expect(result).not.toBeFalsy();
-                        expect(result.akey).toBe("avalue");
+                xio.post.keyvaluestore2(key, model)
+                    .success(function(newkey) {
+                        key = newkey;
+                        $.getJSON("spec/svr/KeyValueStore/" + key, function(v) {
+                            result = v;
+                            expect(result).not.toBeFalsy();
+                            expect(result.akey).toBe("avalue");
 
-                        // cleanup
-                        $.ajax("spec/svr/KeyValueStore/" + key + "?method=DELETE", {
-                            type: "DELETE"
+                            // cleanup
+                            $.ajax("spec/svr/KeyValueStore/" + key + "?method=DELETE", {
+                                type: "DELETE"
+                            });
+                        }).fail(function() {
+                            result = "error";
+                            expect(result).not.toBe("error");
                         });
-                    }).fail(function () {
+
+                    })
+                    .error(function(error) {
                         result = "error";
                         expect(result).not.toBe("error");
                     });
-
-                })
-                .error(function (error) {
-                    result = "error";
-                    expect(result).not.toBe("error");
-                });
             });
         });
     });

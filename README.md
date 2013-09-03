@@ -360,3 +360,10 @@ Additionally, in a completely isolated parallel path, if no progress is made by 
 ## Other notes
 
 If you run the Jasmine tests, make sure the .json file type is set up as a mime type. For example, IIS and IIS Express will return a 403 otherwise. Google reveals this: http://michaellhayden.blogspot.com/2012/07/add-json-mime-type-to-iis-express.html
+
+### License
+
+The license for XIO is pending, as it's not as important to me as getting some initial feedback. It will definitely be an 
+attribution-based license. If you use xio.js as-is, unchanged, with the comments at top, you definitely may use it for 
+any project. I will drop in a license (probably Apache 2 or BSD or  Creative Commons Attribution or somesuch) in the 
+near future.

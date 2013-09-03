@@ -12,7 +12,7 @@ It supports localStorage, sessionStorage, cookies, and RESTful AJAX calls, using
 
 ### Optionally asynchronous
 
-Whether you're working with localStorage or an XHR resource, each operation returna [promise](http://martinfowler.com/bliki/JavascriptPromise.html).
+Whether you're working with localStorage or an XHR resource, each operation returns a [promise](http://martinfowler.com/bliki/JavascriptPromise.html).
 
 When the action is synchronous, such as in working with localStorage, it returns a "synchronous promise" which is essentially a function that can optionally be immediately invoked and it will wrap `.success(value)` and return the value.
 

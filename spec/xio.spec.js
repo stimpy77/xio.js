@@ -385,94 +385,103 @@ describe("xio", function() {
     ////////////////////////////////////////////////////////////////////////
     describe("xhr", function() {
         describe("xio.get.xhr", function() {
-
-            it("async should return data from a route", function () {
-                var v = xio.verbs;
-                xio.define("resources", {
-                    url: "spec/res/{0}",
-                    methods: [v.get],
-                    dataType: 'json'
+            describe("async", function () {
+                it("should return data from a route", function () {
+                    var v = xio.verbs;
+                    xio.define("resources", {
+                        url: "spec/res/{0}",
+                        methods: [v.get],
+                        dataType: 'json'
+                    });
+                    var result;
+                    var state;
+                    xio.get.resources("get.json").success(function (v) {
+                        result = v;
+                        state = "success";
+                    }).error(function (e) {
+                        expect("error").toBeFalsy(" ~ by the way, you need to make sure to add .json file extension to IIS / IIS Express's mime types");
+                        state = "error";
+                    }).complete(function () {
+                        expect(result).not.toBeFalsy();
+                        expect(result.first).not.toBeFalsy();
+                        expect(result.last).not.toBeFalsy();
+                    });
+                    var t = this;
+                    waitsFor(function () {
+                        return state !== undefined;
+                    }, "Unhandled xhr error occurred, check console", 500)
                 });
-                var result;
-                var state;
-                xio.get.resources("get.json").success(function(v) {
-                    result = v;
-                    state = "success";
-                }).error(function (e) {
-                    expect("error").toBeFalsy(" ~ by the way, you need to make sure to add .json file extension to IIS / IIS Express's mime types");
-                    state = "error";
-                }).complete(function() {
+            });
+
+            describe("404", function () {
+
+                it("should cause error condition", function () {
+                    var v = xio.verbs;
+                    xio.define("resources2", {
+                        url: "spec/res/{0}",
+                        methods: [v.get],
+                        dataType: 'json'
+                    });
+                    var result;
+                    var state;
+                    xio.get.resources2("gimme404").success(function (v) {
+                        state = "success";
+                        expect(v).toBe("error");
+                    }).error(function (e) {
+                        result = e;
+                        expect(e).toBe(e); // happy
+                        state = "error";
+                    }).complete(function () {
+                        expect(state).toBe("error")
+                    });
+                    waitsFor(function () {
+                        return state !== undefined;
+                    }, "Unhandled xhr error occurred, check console", 500);
+                });
+            });
+
+            describe("synchronous", function () {
+
+                it("should return data from a route", function () {
+                    var v = xio.verbs;
+                    xio.define("synchronous_resources", {
+                        url: "spec/svr/Sample1/{0}",
+                        methods: [v.get],
+                        async: false // synchronous
+                    });
+                    var id = "mykey";
+                    var result = xio.get.synchronous_resources(id)();
                     expect(result).not.toBeFalsy();
-                    expect(result.first).not.toBeFalsy();
-                    expect(result.last).not.toBeFalsy();
+                    expect(result.name).not.toBeFalsy();
+                    expect(result.value).not.toBeFalsy();
+                    expect(result.name).toBe(id);
+                    expect(result.value).toContain(id);
                 });
-                var t = this;
-                waitsFor(function () {
-                    return state !== undefined;
-                }, "Unhandled xhr error occurred, check console", 500)
             });
 
-            it("404 should cause error condition", function () {
-                var v = xio.verbs;
-                xio.define("resources2", {
-                    url: "spec/res/{0}",
-                    methods: [v.get],
-                    dataType: 'json'
-                });
-                var result;
-                var state;
-                xio.get.resources2("gimme404").success(function (v) {
-                    state = "success";
-                    expect(v).toBe("error");
-                }).error(function (e) {
-                    result = e;
-                    expect(e).toBe(e); // happy
-                    state = "error";
-                }).complete(function () {
-                    expect(state).toBe("error")
-                });
-                waitsFor(function () {
-                    return state !== undefined;
-                }, "Unhandled xhr error occurred, check console", 500);
-            });
+            describe("multi-key request", function () {
 
-            it("synchronous should return data from a route", function() {
-                var v = xio.verbs;
-                xio.define("synchronous_resources", {
-                    url: "spec/svr/Sample1/{0}",
-                    methods: [v.get],
-                    async: false // synchronous
-                });
-                var id = "mykey";
-                var result = xio.get.synchronous_resources(id)();
-                expect(result).not.toBeFalsy();
-                expect(result.name).not.toBeFalsy();
-                expect(result.value).not.toBeFalsy();
-                expect(result.name).toBe(id);
-                expect(result.value).toContain(id);
-            });
-            
-
-            it("multi-key request should return data from a route", function () {
-                var v = xio.verbs;
-                xio.define("multiparam", {
-                    url: "spec/svr/MultiParam/{0}/{1}/{2}",
-                    methods: [v.get],
-                    async: false // synchronous
-                });
-                var compositeKey = ["a", "b", "c"];
-                var result;
-                xio.get.multiparam(compositeKey).success(function (retval) {
-                    result = retval;
-                })
-                .error(function(error) {
-                    result = "error";
-                })
-                .complete(function () {
-                    expect(result).not.toBeFalsy();
-                    expect(result.param1).toBe("a");
-                    expect(result.param2).toBe("b");
-                    expect(result.param3).toBe("c");
+                it("should return data from a route", function () {
+                    var v = xio.verbs;
+                    xio.define("multiparam", {
+                        url: "spec/svr/MultiParam/{0}/{1}/{2}",
+                        methods: [v.get],
+                        async: false // synchronous
+                    });
+                    var compositeKey = ["a", "b", "c"];
+                    var result;
+                    xio.get.multiparam(compositeKey).success(function (retval) {
+                        result = retval;
+                    })
+                    .error(function (error) {
+                        result = "error";
+                    })
+                    .complete(function () {
+                        expect(result).not.toBeFalsy();
+                        expect(result.param1).toBe("a");
+                        expect(result.param2).toBe("b");
+                        expect(result.param3).toBe("c");
+                    });
                 });
             });
         });

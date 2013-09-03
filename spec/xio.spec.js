@@ -432,11 +432,11 @@ describe("xio", function() {
             it("multi-key request should return data from a route", function () {
                 var v = xio.verbs;
                 xio.define("multiparam", {
-                    url: "spec/svr/MultiParam/{0}",
+                    url: "spec/svr/MultiParam/{0}/{1}/{2}",
                     methods: [v.get],
                     async: false // synchronous
                 });
-                var compositeKey = xio.formatString("{0}/{1}/{2}", "a", "b", "c");
+                var compositeKey = ["a", "b", "c"];
                 var result;
                 xio.get.multiparam(compositeKey).success(function (retval) {
                     result = retval;

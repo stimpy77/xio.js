@@ -9,6 +9,9 @@ using System.Web.SessionState;
 
 namespace xio.js
 {
+    /// <summary>
+    /// This is just a test support stuff for xio.spec.js which is the client-side unit tests for xio.js
+    /// </summary>
     public class Global : System.Web.HttpApplication
     {
 

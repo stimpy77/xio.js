@@ -8,6 +8,10 @@ using System.Net;
 
 namespace xio.js.spec
 {
+
+    /// <summary>
+    /// This is just a test support class for xio.spec.js which is the client-side unit tests for xio.js
+    /// </summary>
     public class KeyValueStoreController : ApiController
     {
         static Dictionary<string, object> _values = new Dictionary<string, object>(); 

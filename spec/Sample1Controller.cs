@@ -6,6 +6,9 @@ using System.Web.Http;
 
 namespace xio.js.spec
 {
+    /// <summary>
+    /// This is just a test support class for xio.spec.js which is the client-side unit tests for xio.js
+    /// </summary>
     public class Sample1Controller : ApiController
     {
         [HttpGet]

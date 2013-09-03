@@ -1,4 +1,7 @@
-expect=expect||function(){}; // resolve inspection for IDE
+
+// this 'spec' requires IIS / IIS Express and the .json file type to be added to its MIME types
+
+expect = expect || function () { }; // resolve inspection for IDE
 describe("xio", function() {
 
     describe("xiospec", function() {
@@ -254,13 +257,46 @@ describe("xio", function() {
                     dataType: 'json'
                 });
                 var result;
+                var state;
                 xio.get.resources("get.json").success(function(v) {
                     result = v;
+                    state = "success";
+                }).error(function (e) {
+                    expect("error").toBeFalsy(" ~ by the way, you need to make sure to add .json file extension to IIS / IIS Express's mime types");
+                    state = "error";
                 }).complete(function() {
                     expect(result).not.toBeFalsy();
                     expect(result.first).not.toBeFalsy();
                     expect(result.last).not.toBeFalsy();
                 });
+                var t = this;
+                waitsFor(function () {
+                    return state !== undefined;
+                }, "Unhandled xhr error occurred, check console", 500)
+            });
+
+            it("404 should cause error condition", function () {
+                var v = xio.verbs;
+                xio.define("resources2", {
+                    url: "spec/res/{0}",
+                    methods: [v.get],
+                    dataType: 'json'
+                });
+                var result;
+                var state;
+                xio.get.resources2("gimme404").success(function (v) {
+                    state = "success";
+                    expect(v).toBe("error");
+                }).error(function (e) {
+                    result = e;
+                    expect(e).toBe(e); // happy
+                    state = "error";
+                }).complete(function () {
+                    expect(state).toBe("error")
+                });
+                waitsFor(function () {
+                    return state !== undefined;
+                }, "Unhandled xhr error occurred, check console", 500);
             });
 
             it("synchronous should return data from a route", function() {
@@ -295,7 +331,7 @@ describe("xio", function() {
                 .error(function(error) {
                     result = "error";
                 })
-                    .complete(function () {
+                .complete(function () {
                     expect(result).not.toBeFalsy();
                     expect(result.param1).toBe("a");
                     expect(result.param2).toBe("b");
@@ -346,6 +382,7 @@ describe("xio", function() {
                 var key = 0; // hack, would prefer null to generate "" but the server side test doesn't resolve the route
                 var model = { akey: "avalue" };
                 var result;
+                var state;
                 xio.post.keyvaluestore2(key, model)
                     .success(function(newkey) {
                         key = newkey;
@@ -362,12 +399,17 @@ describe("xio", function() {
                             result = "error";
                             expect(result).not.toBe("error");
                         });
-
+                        state = "success";
                     })
                     .error(function(error) {
                         result = "error";
                         expect(result).not.toBe("error");
+                        state = "error";
                     });
+                
+                waitsFor(function () {
+                    return state !== undefined;
+                }, "unknown failure (timeout)", 500);
             });
         });
     });

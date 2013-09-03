@@ -1,4 +1,8 @@
-(function($) {
+// xio.js
+// http://github.com/stimpy77/xio.js
+// version 0.0.1
+// send feedback to jon@jondavis.net
+(function ($) {
 
     (window || exports).Xio = function () {
         if (!$) throw "jQuery must be referenced before xio.js is loaded.";

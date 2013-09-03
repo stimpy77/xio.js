@@ -130,11 +130,11 @@ Note that using this approach, while more expressive and potentially more conver
                     dataType: 'json',
 					async: false
                 });
-    var val = xio.get.basic_sample([4,12]).success(function(result) {
+    var promise = xio.get.basic_sample([4,12]).success(function(result) {
 	   // ..
 	});
 	// alternatively ..
-    var val = define_result.get([4,12]).success(function(result) {
+    var promise_ = define_result.get([4,12]).success(function(result) {
 	   // ..
 	});
 
@@ -163,11 +163,11 @@ In fact,
 
 Sample 2:
 
-	xio.define("basic_sample2", {
+	var ops = xio.define("basic_sample2", {
                     get: function(key) { return "value"; },
                     post: function(key,value) { return "ok"; }
                 });
-    var val = xio.get["basic_sample2"]("mykey").success(function(result) {
+    var promise = xio.get["basic_sample2"]("mykey").success(function(result) {
 	   // ..
 	});
 

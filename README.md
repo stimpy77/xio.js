@@ -39,13 +39,13 @@ Whenever a new repository is defined using XIO, a set of supported verb and thei
 
 .. and each of these would return a [promise](http://martinfowler.com/bliki/JavascriptPromise.html).
 
-### XIO's optional alternative convention
+### XIO's alternative convention
 
 But the built-in convention is a bit unique using `xio[action][repository](key, value)` (i.e. `xio.post.myRepository("mykey", {first: "Bob", last: "Bison"})`, which, again, returns a promise. 
 
 This syntactical convention, with the verb preceding the repository, is different from the usual convention of `_object.method(key, value)`.
 
-### Why?!
+#### Why?!
 
 The primary reason was to be able to isolate the repository from the operation, so that one could theoretically swap out one repository for another with minimal or no changes to CRUD code. For example, 
 

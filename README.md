@@ -33,7 +33,7 @@ See xio.verbs:
 
     // initialize
 
-	var xio = (window || exports).Xio(); // initialize a global module instance named "xio";
+	var xio = (window || exports).Xio(); // initialize a module instance named "xio";
 
 #### localStorage
 

@@ -31,6 +31,10 @@ See xio.verbs:
 
 ### Examples
 
+    // initialize
+
+	var xio = (window || exports).Xio(); // initialize a global module instance named "xio";
+
 #### localStorage
 
     xio.set.local("my_key", "my_value");
@@ -203,10 +207,6 @@ Note that using this approach, while more expressive and potentially more conver
 jQuery is required for now, for XHR-based operations. This dependency requirement might be dropped in the future.
 
 ## Future intentions
-
-### global vs modular
-
-For purposes of this prototype, the xio namespace is currently a global object. The next plan is to make it constructor and/or module based.
 
 ### PATCH support
 

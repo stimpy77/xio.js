@@ -5,7 +5,8 @@ expect = expect || function () { }; // resolve inspection for IDE
 describe("xio", function() {
 
     describe("xiospec", function() {
-        it("should init", function() {
+        it("should init", function () {
+            (window || exports).xio = (window || exports).xio || Xio();
             expect(this).toBeDefined();
             $.ajax("spec/svr/KeyValueStore?method=clear", {
                 type: "POST",

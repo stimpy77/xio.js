@@ -1,6 +1,6 @@
 // xio.js
 // http://github.com/stimpy77/xio.js
-// version 0.0.1
+// version 0.1.0
 // send feedback to jon@jondavis.net
 (function ($) {
 

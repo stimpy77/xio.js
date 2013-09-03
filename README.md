@@ -130,13 +130,13 @@ Note that using this approach, while more expressive and potentially more conver
                     dataType: 'json',
 					async: false
                 });
-    var val = xio.get["basic_sample"]([4,12]).success(function(result) {
+    var val = xio.get.basic_sample([4,12]).success(function(result) {
 	   // ..
 	});
 
 The `define()` function creates a verb handler or route.
 
-The `url` property is a formatter that is used by the `key` parameter of any CRUD operation. The `key` parameter can be a string or an array of strings. This value will be applied to the `url` property using the same convention as the typical string formatters in other languages such as C#'s `string.Format()`.
+The `url` property is a formatter that is formatted with the `key` parameter of any XHR-based CRUD operation. The `key` parameter can be a string or an array of strings. This value will be applied to the `url` property using the same convention as the typical string formatters in other languages such as C#'s `string.Format()`.
 
 Where the `methods` property is defined as an array of "GET", "POST", etc, for each one mapping to standard XIO verbs an XHR route will be internally created on behalf of the rest of the options defined in the options object that is passed in as a parameter to `define()`. The return value of `define()` is an object that lists all of the various operations that were wrapped for XIO (i.e. `get()`, `post()`, etc).
 

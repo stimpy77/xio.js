@@ -14,7 +14,7 @@ The convention is a bit unique using `xio[action][repository](key, value)`. This
 
 As a bit of an experiment, it seems to read and write better. Rather than taking a repository and reading and writing from/to it, the perspective is flipped and you are focusing on *what you need to do* while the target becomes more like a *parameter* at least in thought. The goal is to dumb down CRUD operation concepts and repositories so that, rather than repositories having an unknown set of operations with unknown interface styles and other features, instead, your standard CRUD operations, which are predictable, have a set of valid repository targets.
 
-Meanwhile, when you define a repository with xio.define(), it returns an object that contains the operations (`get()`, `post()`, etc) that it supports. So if you really want to use the conventional *repository*[*method*](*key*, *value*) approach, you still can!
+Meanwhile, when you define a repository with xio.define(), it returns an object that contains the operations (`get()`, `post()`, etc) that it supports. So if you really want to use the conventional `repository[method](key, value)` approach, you still can!
 
 ### Download
 

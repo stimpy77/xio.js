@@ -123,7 +123,8 @@ Note that using this approach, while more expressive and potentially more conver
 
 #### web server resource (basics)
 
-    xio.define("basic_sample", {
+    var define_result =
+	    xio.define("basic_sample", {
                     url: "URI{0}/{1}",
                     methods: [ xio.verbs.get, xio.verbs.post, xio.verbs.put, xio.verbs.delete ],
                     dataType: 'json',
@@ -140,6 +141,15 @@ The `url` property is a formatter that is used by the `key` parameter of any CRU
 Where the `methods` property is defined as an array of "GET", "POST", etc, for each one mapping to standard XIO verbs an XHR route will be internally created on behalf of the rest of the options defined in the options object that is passed in as a parameter to `define()`. The return value of `define()` is an object that lists all of the various operations that were wrapped for XIO (i.e. `get()`, `post()`, etc).
 
 The rest of the options are used, for now, as a jQuery's $.ajax(..., `options`) parameter. The `async` property defaults to false. When `async` is `true`, the returned promise is wrapped with a "synchronous promise", which you can *optionally* immediately invoke with parens (`()`) which will return the value that is normally passed into `.success(function (value) { .. }`.
+
+In this example, `define_result` is an object that looks like this:
+
+    {
+	    get: function(key) { /* .. */ },
+	    post: function(key, value) { /* .. */ },
+	    put: function(key, value) { /* .. */ },
+	    delete: function(key) { /* .. */ }
+	}
 
 	xio.define("basic_sample2", {
                     get: function(key) { return "value"; },

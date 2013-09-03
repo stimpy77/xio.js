@@ -14,7 +14,20 @@ This convention, with the verb preceding the repository, is different from the u
 
 ### Why?!
 
-As a bit of an experiment, it seems to read and write better. Rather than taking a repository and reading and writing from/to it, the perspective is flipped and you are focusing on *what you need to do* while the target becomes more like a *parameter* at least in thought. The goal is to dumb down CRUD operation concepts and repositories so that, rather than repositories having an unknown set of operations with unknown interface styles and other features, instead, your standard CRUD operations, which are predictable, have a set of valid repository targets.
+The primary reason was to be able to isolate the repository from the operation, so that one could theoretically swap out one repository for another with minimal or no changes to CRUD code. For example, 
+
+    var repository = "local"; // replace with "my_restful_service" when ready to integrate with the server
+	xhr.post[repository](key, value).complete(function() {
+
+	    xhr.get[repository](key).success(function(val) {
+		    console.log(val);
+		});
+
+	});
+
+Note here how "repository" is something that can move around. The goal, therefore, is to make localStorage and RESTful web service targets support the same features.
+
+As a bit of an experiment, this convention of xhr[verb][repository] also seems to read and write a little better, even if it's a bit weird at first to see. The thinking is similar to the `verb-target` convention in PowerShell. Rather than taking a repository and reading and writing from/to it, the perspective is flipped and you are focusing on *what you need to do* while the target becomes more like a *parameter* at least in thought. The goal is to dumb down CRUD operation concepts and repositories so that, rather than repositories having an unknown set of operations with unknown interface styles and other features, instead, your standard CRUD operations, which are predictable, have a set of valid repository targets.
 
 This approach would have been entirely unnecessary and pointless if Javascript inherently supported interfaces, because then we could just define a CRUD interface and write all our repositories against those CRUD operations. But it doesn't, and indeed with the convention of closures and modules, it really can't.
 

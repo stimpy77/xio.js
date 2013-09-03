@@ -6,7 +6,7 @@ A consistent data repository strategy for local and remote resources.
 
 ## What it does
 
-xio.js is a library that enables you to read and write data to/from data stores and remote servers using a consistent interface convention. It enables you to write code that can be more easily migrated between storage locations and/or URIs.
+xio.js is a Javascript resource that supports reading and writing data to/from local data stores and remote servers using a consistent interface convention. One can write code that can be more easily migrated between storage locations and/or URIs, and repository operations are simplified into a simple set of verbs.
 
 It supports localStorage, sessionStorage, cookies, and RESTful AJAX calls, using the same interface and conventions.
 

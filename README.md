@@ -224,7 +224,7 @@ Note that using this approach, while more expressive and potentially more conver
 
 	// oh by the way,
 	for (var p in custom1) {
-	    if (custom1.hasOwnProperty(p)) {
+	    if (custom1.hasOwnProperty(p) && typeof(custom1[p]) == "function") {
 		    console.log("custom1." + p); // should emit custom1.get and custom1.post
 		}
 	}

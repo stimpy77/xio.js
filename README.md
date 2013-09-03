@@ -137,9 +137,9 @@ The `define()` function creates a verb handler or route.
 
 The `url` property is a formatter that is used by the `key` parameter of any CRUD operation. The `key` parameter can be a string or an array of strings. This value will be applied to the `url` property using the same convention as the typical string formatters in other languages such as C#'s `string.Format()`.
 
-Where the `methods` property is defined as an array of "GET", "POST", etc, for each one mapping to standard XIO verbs an XHR route will be internally created on behalf of the rest of the options defined in the options object that is passed in as a parameter to `define()`. The return value of `define()` is an object that lists all of the various operations that were wrapped for Xio (i.e. `get()`, `post()`, etc).
+Where the `methods` property is defined as an array of "GET", "POST", etc, for each one mapping to standard XIO verbs an XHR route will be internally created on behalf of the rest of the options defined in the options object that is passed in as a parameter to `define()`. The return value of `define()` is an object that lists all of the various operations that were wrapped for XIO (i.e. `get()`, `post()`, etc).
 
-When `async` is `true`, the returned promise is wrapped with a "synchronous promise", which you can immediately invoke with parens (`()`) which will return the value that is normally passed into `.success(function (value) { .. }`.
+The rest of the options are used, for now, as a jQuery's $.ajax(..., `options`) parameter. The `async` property defaults to false. When `async` is `true`, the returned promise is wrapped with a "synchronous promise", which you can immediately invoke with parens (`()`) which will return the value that is normally passed into `.success(function (value) { .. }`.
 
 	xio.define("basic_sample2", {
                     get: function(key) { return "value"; },

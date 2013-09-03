@@ -8,6 +8,10 @@ A consistent data CRUD API strategy for local and remote resources.
 
 xio.js is a library that enables you to read and write data to/from data stores and remote servers using a consistent interface. It enables you to write code that can be more easily migrated between storage locations and/or URIs.
 
+#### Download
+
+Download here: https://github.com/stimpy77/xio.js/blob/master/src/xio.js
+
 ### Basic verbs
 
 See xio.verbs:

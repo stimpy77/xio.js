@@ -109,14 +109,16 @@ See `xio.verbs`:
         val = v;
     });
 
+The following is a plan-to-have ..
+
     // PATCH support!? (todo; not yet implemented)
     xio.set.local("my_key", {
         first: "Bob",
         last: "Jones"
     }).complete(function() {
-		xio.patch.local("my_key", {
-			last: "Jonas" // keep first name
-		});
+        xio.patch.local("my_key", {
+            last: "Jonas" // keep first name
+        });
     });
   
 #### sessionStorage

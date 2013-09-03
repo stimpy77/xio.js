@@ -155,7 +155,7 @@ In fact,
 
     define_result.get === xio.get.basic_sample
 
-.. will evaluate to `true`.
+.. should evaluate to `true`.
 
 Sample 2:
 

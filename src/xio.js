@@ -7,15 +7,27 @@
     (window || exports).Xio = function () {
         if (!$) throw "jQuery must be referenced before xio.js is loaded.";
 
-        debugger;
+        function formatKey(key) {
+            if ($.type(key) == "array") {
+                key = $.makeArray(key);
+                for (var i in key) {
+                    key[i] = key[i].toString();
+                }
+                key = key.join('-');
+            }
+            return key;
+        }
+
         // localStorage
         function localSetDefinition(key, value) {
+            key = formatKey(key);
             if (typeof (value) == "object") {
                 value = stringify(value);
             }
             localStorage.setItem(key, value);
         }
         function localGetDefinition(key) {
+            key = formatKey(key);
             var result = localStorage.getItem(key);
             if (result && ((result.indexOf("{") == 0 && result.indexOf("}") == result.length - 1) ||
                           (result.indexOf("[") == 0 && result.indexOf("]") == result.length - 1))) {
@@ -30,6 +42,7 @@
         }
 
         function localDeleteDefinition(key) {
+            key = formatKey(key);
             localStorage.removeItem(key);
         }
 
@@ -37,6 +50,7 @@
 
         // sessionStorage
         function sessionSetDefinition(key, value) {
+            key = formatKey(key);
             if (typeof (value) == "object") {
                 value = stringify(value);
             }
@@ -44,6 +58,7 @@
         }
 
         function sessionGetDefinition(key) {
+            key = formatKey(key);
             var result = sessionStorage.getItem(key);
             if (result && ((result.indexOf("{") == 0 && result.indexOf("}") == result.length - 1) ||
                           (result.indexOf("[") == 0 && result.indexOf("]") == result.length - 1))) {
@@ -58,12 +73,14 @@
         }
 
         function sessionDeleteDefinition(key) {
+            key = formatKey(key);
             sessionStorage.removeItem(key);
         }
 
 
         // cookie
         function cookieSetDefinition(key, value, expires, path, domain) {
+            key = formatKey(key);
             if (typeof (value) == "object") {
                 value = stringify(value);
             }
@@ -113,10 +130,12 @@
         }
 
         function cookieDeleteDefinition(key, path, domain) {
+            key = formatKey(key);
             cookieSetDefinition(key, "-", new Date("Jan 1, 1970"), path, domain);
         }
 
         function cookieGetDefinition(key) {
+            key = formatKey(key);
             // from mozilla (!!)
             var result = decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(key).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
             if (result && ((result.indexOf("{") == 0 && result.indexOf("}") == result.length - 1) ||

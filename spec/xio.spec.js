@@ -33,13 +33,25 @@ describe("xio", function() {
             });
         });
 
-        describe("xio.set.local(k,v)", function() {
-            it("should store data into localStorage", function() {
+        describe("xio.set.local(k,v)", function () {
+            it("should store data into localStorage", function () {
                 var key = Date.now().valueOf().toString();
                 var value = "xio localStorage setter works";
                 var target = "local";
                 xio.set[target](key, value);
                 var result = localStorage.getItem(key);
+                if (result) localStorage.removeItem(key); // cleanup
+                expect(result).toBe(value);
+            });
+        });
+
+        describe("xio.set.local([multi,key],v)", function () {
+            it("should store data into localStorage with multi-key array", function () {
+                var key = [Date.now().valueOf(), 3, 9];
+                var value = "xio localStorage setter works";
+                var target = "local";
+                xio.set[target](key, value);
+                var result = localStorage.getItem(key[0].toString() + '-' + key[1].toString() + '-' + key[2].toString());
                 if (result) localStorage.removeItem(key); // cleanup
                 expect(result).toBe(value);
             });
@@ -57,12 +69,24 @@ describe("xio", function() {
             });
         });
 
-        describe("xio.get.local(k)", function() {
-            it("should retrieve data from localStorage", function() {
+        describe("xio.get.local(k)", function () {
+            it("should retrieve data from localStorage", function () {
                 var key = Date.now().valueOf().toString();
                 var value = "xio localStorage getter works";
                 var fromSource = "local";
                 localStorage.setItem(key, value);
+                var result = xio.get[fromSource](key)();  // synchronous
+                if (result) localStorage.removeItem(key); // cleanup
+                expect(result).toBe(value);
+            });
+        });
+
+        describe("xio.get.local([multi,key])", function () {
+            it("should retrieve data from localStorage with multi-key array", function () {
+                var key = [Date.now().valueOf(), 9, 7];
+                var value = "xio localStorage getter works";
+                var fromSource = "local";
+                localStorage.setItem(key[0].toString() + "-" + key[1].toString() + "-" + key[2].toString(), value);
                 var result = xio.get[fromSource](key)();  // synchronous
                 if (result) localStorage.removeItem(key); // cleanup
                 expect(result).toBe(value);

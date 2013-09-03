@@ -128,7 +128,7 @@ describe("xio", function() {
                 var value = "xio localStorage delete";
                 var fromSource = "local";
                 localStorage.setItem(key, value);
-                xio.delete[fromSource](key);
+                xio["delete"][fromSource](key);
                 var result = localStorage.getItem(key);
                 expect(result).toBeFalsy();
             });
@@ -194,7 +194,7 @@ describe("xio", function() {
                 var value = "xio sessionStorage delete";
                 var fromSource = "session";
                 sessionStorage.setItem(key, value);
-                xio.delete[fromSource](key);
+                xio["delete"][fromSource](key);
                 var result = sessionStorage.getItem(key);
                 expect(result).toBeFalsy();
             });
@@ -298,7 +298,7 @@ describe("xio", function() {
                 document.cookie = encodeURIComponent(key) + "=" + encodeURIComponent(value);
                 var result = document.cookie;
                 expect(result).toContain(encodeURIComponent(key) + "=" + encodeURIComponent(value));
-                xio.delete[fromSource](key);
+                xio["delete"][fromSource](key);
                 result = document.cookie;
                 expect(result).not.toContain(encodeURIComponent(key) + "=" + encodeURIComponent(value));
             });
@@ -325,7 +325,7 @@ describe("xio", function() {
             expect(typeof (definition.get)).toBe("function");
             expect(typeof (definition.post)).toBe("function");
             expect(typeof (definition.put)).toBe("function");
-            expect(definition.delete).toBeFalsy();
+            expect(definition["delete"]).toBeFalsy();
         });
 
         it("should allow me to declare my own implementation", function () {
@@ -686,7 +686,7 @@ describe("xio", function() {
                 var v = xio.verbs;
                 xio.define("keyvaluestore3", {
                     url: "spec/svr/KeyValueStore/{0}",
-                    methods: [v.delete]
+                    methods: [v["delete"]]
                 });
 
                 $.ajax("/spec/svr/KeyValueStore/deletetest", {
@@ -697,7 +697,7 @@ describe("xio", function() {
 
                 var state;
                 var result;
-                xio.delete.keyvaluestore3("deletetest").complete(function () {
+                xio["delete"].keyvaluestore3("deletetest").complete(function () {
                     $.getJSON("/spec/svr/KeyValueStore/deletetest").success(function (v) {
                         result = v;
                     }).complete(function () {

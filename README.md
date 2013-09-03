@@ -12,7 +12,7 @@ The convention is a bit unique using `xio[action][repository](key, value)`. This
 
 ### Why?!
 
-As a bit of an experiment, it seems to read and write better. Rather than taking a repository and reading and writing from/to it, the perspective is flipped and you are focusing on *what you need to do* while the target becomes more like a *parameter* at least in thought. The goal is to dumb down CRUD operation concepts and repositories so that rather than repositories having an unknown set of CRUD operation features your standard CRUD operations, which are predictable, have a set of valid repository targets.
+As a bit of an experiment, it seems to read and write better. Rather than taking a repository and reading and writing from/to it, the perspective is flipped and you are focusing on *what you need to do* while the target becomes more like a *parameter* at least in thought. The goal is to dumb down CRUD operation concepts and repositories so that, rather than repositories having an unknown set of CRUD operation features, instad your standard CRUD operations, which are predictable, have a set of valid repository targets.
 
 ### Download
 

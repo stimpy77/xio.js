@@ -10,7 +10,24 @@ xio.js is a Javascript resource that supports reading and writing data to/from l
 
 It supports localStorage, sessionStorage, cookies, and RESTful AJAX calls, using the same interface and conventions.
 
-The convention is a bit unique using `xio[action][repository](key, value)` (i.e. `xio.post.myrepository("mykey", {first: "Bob", last: "Bison"})`, and always returns a promise. When the action is synchronous, such as in working with localStorage, it returns a "synchronous promise" which is essentially a function that can optionally be immediately invoked and it will wrap `.success(value)` and return the value.
+### XIO's optional alternative convention
+
+Whenever a new repository is defined using XIO, a set of supported verb and their implemented functions is returned and can be used as a repository object. For example:
+
+    var myRepository = xio.define({ url: '/myRepository?key={0}', methods: ["GET", "POST", "PUT", "DELETE"]});
+
+.. would populate the variable `myRepository` with:
+
+    {
+        get: function(key) { /* .. */ },
+        post: function(key, value) { /* .. */ },
+        put: function(key, value) { /* .. */ },
+        delete: function(key) { /* .. */ }
+    }
+
+.. and each of these would return a [promise](http://martinfowler.com/bliki/JavascriptPromise.html).
+
+But the built-in convention is a bit unique using `xio[action][repository](key, value)` (i.e. `xio.post.myrepository("mykey", {first: "Bob", last: "Bison"})`, and always returns a promise. When the action is synchronous, such as in working with localStorage, it returns a "synchronous promise" which is essentially a function that can optionally be immediately invoked and it will wrap `.success(value)` and return the value.
 
 This syntactical convention, with the verb preceding the repository, is different from the usual convention of `_object.method(key, value)`.
 

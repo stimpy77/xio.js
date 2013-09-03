@@ -151,6 +151,12 @@ In the above example, `define_result` is an object that looks like this:
 	    delete: function(key) { /* .. */ }
 	}
 
+In fact,
+
+    define_result.get === xio.get.basic_sample
+
+.. will evaluate to `true`.
+
 Sample 2:
 
 	xio.define("basic_sample2", {

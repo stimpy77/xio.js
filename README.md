@@ -16,7 +16,9 @@ This convention, with the verb preceding the repository, is different from the u
 
 The primary reason was to be able to isolate the repository from the operation, so that one could theoretically swap out one repository for another with minimal or no changes to CRUD code. For example, 
 
-    var repository = "local"; // use localStorage for now; replace with "my_restful_service" when ready to integrate with the server
+    var repository = "local"; // use localStorage for now; 
+	                          // replace with "my_restful_service" when ready 
+							  // to integrate with the server
 	xhr.post[repository](key, value).complete(function() {
 
 	    xhr.get[repository](key).success(function(val) {

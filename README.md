@@ -151,6 +151,8 @@ In this example, `define_result` is an object that looks like this:
 	    delete: function(key) { /* .. */ }
 	}
 
+Sample 2:
+
 	xio.define("basic_sample2", {
                     get: function(key) { return "value"; },
                     post: function(key,value) { return "ok"; }

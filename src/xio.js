@@ -6,10 +6,20 @@
         debugger;
         // localStorage
         function localSetDefinition(key, value) {
+            if (typeof (value) == "object") {
+                value = stringify(value);
+            }
             localStorage.setItem(key, value);
         }
         function localGetDefinition(key) {
             var result = localStorage.getItem(key);
+            if (result && ((result.indexOf("{") == 0 && result.indexOf("}") == result.length - 1) ||
+                          (result.indexOf("[") == 0 && result.indexOf("]") == result.length - 1))) {
+                try {
+                    result = parseJSON(result);
+                }
+                catch (error) { }
+            }
             return result !== undefined && result !== null
                 ? synchronousPromiseResult({ success: function (callback) { callback.call(this, result); } })
                 : synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });
@@ -23,11 +33,21 @@
 
         // sessionStorage
         function sessionSetDefinition(key, value) {
+            if (typeof (value) == "object") {
+                value = stringify(value);
+            }
             sessionStorage.setItem(key, value);
         }
 
         function sessionGetDefinition(key) {
             var result = sessionStorage.getItem(key);
+            if (result && ((result.indexOf("{") == 0 && result.indexOf("}") == result.length - 1) ||
+                          (result.indexOf("[") == 0 && result.indexOf("]") == result.length - 1))) {
+                try {
+                    result = parseJSON(result);
+                }
+                catch (error) { }
+            }
             return result !== undefined && result !== null
                 ? synchronousPromiseResult({ success: function (callback) { callback.call(this, result); } })
                 : synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });
@@ -40,6 +60,9 @@
 
         // cookie
         function cookieSetDefinition(key, value, expires, path, domain) {
+            if (typeof (value) == "object") {
+                value = stringify(value);
+            }
             if (window.location.href.indexOf("file:///") == 0) {
                 throw "Cannot set a cookie on a local file system document. Use a web server.";
             }
@@ -91,9 +114,16 @@
 
         function cookieGetDefinition(key) {
             // from mozilla (!!)
-            var ret = decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(key).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
-            return ret
-                ? synchronousPromiseResult({ success: function (callback) { callback.call(this, ret); } })
+            var result = decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(key).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+            if (result && ((result.indexOf("{") == 0 && result.indexOf("}") == result.length - 1) ||
+                          (result.indexOf("[") == 0 && result.indexOf("]") == result.length - 1))) {
+                try {
+                    result = parseJSON(result);
+                }
+                catch (error) { }
+            }
+            return result
+                ? synchronousPromiseResult({ success: function (callback) { callback.call(this, result); } })
                 : synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });
         }
 
@@ -276,6 +306,13 @@
                 }
             }
             return str;
+        }
+
+        function parseJSON(obj) {
+            if (!JSON || !JSON.stringify) {
+                throw "json2.js is required; please reference it.";
+            }
+            return JSON.parse(obj);
         }
 
         function stringify(obj) {

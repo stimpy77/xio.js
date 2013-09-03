@@ -45,6 +45,18 @@ describe("xio", function() {
             });
         });
 
+        describe("xio.set.local(k,obj)", function () {
+            it("should store a serialized object into localStorage", function () {
+                var key = Date.now().valueOf().toString();
+                var value = { first: "Doug", last: "Heinous" };
+                var target = "local";
+                xio.set[target](key, value);
+                var result = localStorage.getItem(key);
+                if (result) localStorage.removeItem(key); // cleanup
+                expect(result).toBe(JSON.stringify(value));
+            });
+        });
+
         describe("xio.get.local(k)", function() {
             it("should retrieve data from localStorage", function() {
                 var key = Date.now().valueOf().toString();
@@ -128,6 +140,18 @@ describe("xio", function() {
             });
         });
 
+        describe("xio.set.session(k,obj)", function () {
+            it("should store a serialized object into sessionStorage", function () {
+                var key = Date.now().valueOf().toString();
+                var value = { first: "Doug", last: "Heinous" };
+                var target = "session";
+                xio.set[target](key, value);
+                var result = sessionStorage.getItem(key);
+                if (result) sessionStorage.removeItem(key); // cleanup
+                expect(result).toBe(JSON.stringify(value));
+            });
+        });
+
         describe("xio.get.session(k)", function() {
             it("should retrieve data from sessionStorage", function() {
                 var key = Date.now().valueOf().toString();
@@ -174,6 +198,22 @@ describe("xio", function() {
             });
         });
 
+
+        describe("xio.set.cookie(k,obj)", function () {
+            it("should store data obj into cookie", function () {
+                var key = Date.now().valueOf().toString();
+                var value = { first: "Bill", last: "Regus" };
+                var target = "cookie";
+                xio.set[target](key, value);
+                var result = decodeURIComponent(document.cookie);
+
+                // cleanup
+                document.cookie = encodeURIComponent(key) + "=-;expires=" + (new Date("Jan 1, 1970")).toUTCString();
+
+                expect(result).toContain("\"first\"");
+                expect(result).toContain("\"Regus\"");
+            });
+        });
 
         describe("xio.put.cookie(k,v).expires() as redefine args builder", function() {
             it("should store data into a cookie with a path argument", function() {

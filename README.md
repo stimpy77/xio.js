@@ -12,7 +12,7 @@ It supports localStorage, sessionStorage, cookies, and RESTful AJAX calls, using
 
 The convention is a bit unique using `xio[action][repository](key, value)` (i.e. `xio.post.myrepository("mykey", {first: "Bob", last: "Bison"})`, and always returns a promise. When the action is synchronous, such as in working with localStorage, it returns a "synchronous promise" which is essentially a function that can optionally be immediately invoked and it will wrap `.success(value)` and return the value.
 
-This convention, with the verb preceding the repository, is different from the usual convention of `_object.method(key, value)`.
+This syntactical convention, with the verb preceding the repository, is different from the usual convention of `_object.method(key, value)`.
 
 ### Why?!
 

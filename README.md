@@ -25,11 +25,11 @@ To write and read to and from a web service (as optionally synchronous),
 
 See the pattern? It supports localStorage, sessionStorage, cookies, and RESTful AJAX calls, using the same interface and conventions.
 
-### Optionally asynchronous
+### Optionally synchronous (asynchronous by default)
 
 Whether you're working with localStorage or an XHR resource, each operation returns a [promise](http://martinfowler.com/bliki/JavascriptPromise.html).
 
-When the action is synchronous, such as in working with localStorage, it returns a "synchronous promise" which is essentially a function that can optionally be immediately invoked and it will wrap `.success(value)` and return the value.
+When the action is synchronous, such as in working with localStorage, it returns a "synchronous promise" which is essentially a function that can optionally be immediately invoked and it will wrap `.success(value)` and return the value. This also works with XHR when `async: false` is passed in with the options during setup (`define(..)`).
 
 The examples below are the same, only because XIO knows that the localStorage implementation of get is synchronous.
 

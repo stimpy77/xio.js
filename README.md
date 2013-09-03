@@ -6,9 +6,15 @@ A consistent data CRUD API strategy for local and remote resources.
 
 ## What it does
 
-xio.js is a library that enables you to read and write data to/from data stores and remote servers using a consistent interface. It enables you to write code that can be more easily migrated between storage locations and/or URIs.
+xio.js is a library that enables you to read and write data to/from data stores and remote servers using a consistent interface convention. It enables you to write code that can be more easily migrated between storage locations and/or URIs.
 
-#### Download
+The convention is a bit unique using `xio[action][repository](key, value)`. This is different from the usual convention of `[object][method](key, value)`.
+
+### Why?!
+
+As a bit of an experiment, it seems read and write better. Rather than taking a repository and reading and writing from/to it, the perspective is flipped and you are focusing on *what you need to do* while the target becomes more like a *parameter* at least in thought. The goal is to dumb down CRUD operation concepts and repositories so that rather than repositories having an unknown set of CRUD operation features your standard CRUD operations, which are predictable, have a set of valid repository targets.
+
+### Download
 
 Download here: https://github.com/stimpy77/xio.js/blob/master/src/xio.js
 
@@ -176,13 +182,21 @@ Note that using this approach, while more expressive and potentially more conver
 	xio.get.custom1("tehkey").success(function(v) { alert(v); } ); // alerts "teh value for tehkey";
     xio.redefine("custom1", xio.verbs.get, function(key) { return "teh better value for " + key; });
 	xio.get.custom1("tehkey").success(function(v) { alert(v); } ); // alerts "teh better value for tehkey"
-	xio.redefine("custom1", {
-	    url: "customurl/{0}",
-	    methods: [xio.verbs.post],
-		get: function(key) { return "custom getter still"; }
-	});
+	var custom1 = 
+	    xio.redefine("custom1", {
+			url: "customurl/{0}",
+			methods: [xio.verbs.post],
+			get: function(key) { return "custom getter still"; }
+		});
 	xio.post.custom1("tehkey", "val"); // asynchronously posts to URL http://host_server/customurl/tehkey
 	xio.get.custom1("tehkey").success(function(v) { alert(v); } ); // alerts "custom getter still"
+
+	// oh by the way,
+	for (var p in custom1) {
+	    if (custom1.hasOwnProperty(p)) {
+		    console.log("custom1." + p); // emits custom1.get and custom1.post
+		}
+	}
 
 ## Dependencies
 

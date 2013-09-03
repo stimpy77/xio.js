@@ -66,7 +66,7 @@ As a bit of an experiment, this convention of xio[verb][repository] also seems t
 
 This approach would have been entirely unnecessary and pointless if Javascript inherently supported interfaces, because then we could just define a CRUD interface and write all our repositories against those CRUD operations. But it doesn't, and indeed with the convention of closures and modules, it really can't.
 
-Meanwhile, when you define a repository with xio.define(), it returns an object that contains the operations (`get()`, `post()`, etc) that it supports. So if you really want to use the conventional `repository[method](key, value)` approach, you still can!
+Meanwhile, when you define a repository with xio.define(), as was described above and detailed again below, it returns an object that contains the operations (`get()`, `post()`, etc) that it supports. So if you really want to use the conventional `repository[method](key, value)` approach, you still can!
 
 ### Download
 

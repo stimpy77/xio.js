@@ -133,6 +133,10 @@ Note that using this approach, while more expressive and potentially more conver
     var val = xio.get.basic_sample([4,12]).success(function(result) {
 	   // ..
 	});
+	// alternatively ..
+    var val = define_result.get([4,12]).success(function(result) {
+	   // ..
+	});
 
 The `define()` function creates a verb handler or route.
 

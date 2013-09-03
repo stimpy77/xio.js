@@ -325,7 +325,8 @@
         function formatString(str) {
             if (/\{\d+\}/.test(str)) {
                 for (var i = 1; i < arguments.length; i++) {
-                    str = str.replace(new RegExp("\\{" + (i - 1) + "\\}", 'g'), arguments[i].toString() || "");
+                    var arg = encodeURIComponent(arguments[i].toString());
+                    str = str.replace(new RegExp("\\{" + (i - 1) + "\\}", 'g'), arg || "");
                 }
             }
             return str;

@@ -365,5 +365,5 @@ If you run the Jasmine tests, make sure the .json file type is set up as a mime 
 
 The license for XIO is pending, as it's not as important to me as getting some initial feedback. It will definitely be an 
 attribution-based license. If you use xio.js as-is, unchanged, with the comments at top, you definitely may use it for 
-any project. I will drop in a license (probably Apache 2 or BSD or  Creative Commons Attribution or somesuch) in the 
+any project. I will drop in a license (probably Apache 2 or BSD or Creative Commons Attribution or somesuch) in the 
 near future.

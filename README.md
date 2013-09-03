@@ -125,7 +125,7 @@ Note that using this approach, while more expressive and potentially more conver
 
     var define_result =
 	    xio.define("basic_sample", {
-                    url: "URI{0}/{1}",
+                    url: "my/url/{0}/{1}",
                     methods: [ xio.verbs.get, xio.verbs.post, xio.verbs.put, xio.verbs.delete ],
                     dataType: 'json',
 					async: false

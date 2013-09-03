@@ -41,6 +41,10 @@ Meanwhile, when you define a repository with xio.define(), it returns an object 
 
 Download here: https://github.com/stimpy77/xio.js/blob/master/src/xio.js
 
+## Dependencies
+
+jQuery is required for now, for XHR-based operations, so it's not quite ready for node.js. This dependency requirement might be dropped in the future.
+
 ### Basic verbs
 
 See xio.verbs:
@@ -224,10 +228,6 @@ Note that using this approach, while more expressive and potentially more conver
 		    console.log("custom1." + p); // should emit custom1.get and custom1.post
 		}
 	}
-
-## Dependencies
-
-jQuery is required for now, for XHR-based operations. This dependency requirement might be dropped in the future.
 
 ## Future intentions
 

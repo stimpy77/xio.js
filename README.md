@@ -194,7 +194,7 @@ Note that using this approach, while more expressive and potentially more conver
 	// oh by the way,
 	for (var p in custom1) {
 	    if (custom1.hasOwnProperty(p)) {
-		    console.log("custom1." + p); // emits custom1.get and custom1.post
+		    console.log("custom1." + p); // should emit custom1.get and custom1.post
 		}
 	}
 
@@ -204,8 +204,24 @@ jQuery is required for now, for XHR-based operations. This dependency requiremen
 
 ## Future intentions
 
-HTTP GET and POST have been conceptualized and tested. The DELETE, PUT and PATCH operations are still pending tests. PATCH applied to localStorage given a stringified data model as the stored value could be very interesting and useful so it is also in the queue to be added.
+### global vs modular
 
-## Side notes
+For purposes of this prototype, the xio namespace is currently a global object. The next plan is to make it constructor and/or module based.
+
+### PATCH support
+
+See documentation above, there are to-do notes in there.
+
+### WebSockets and WebRTC support
+
+The original motivation to produce an I/O library was actually to implement a WebSockets client that can fallback to long polling, and that has no dependency upon jQuery. Instead, what has so far become implemented has been a standard AJAX interface that depends upon jQuery. Go figure.
+
+If and when WebSocket support gets added, the next step will be WebRTC. 
+
+Meanwhile, jQuery needs to be replaced with something that works fine on nodejs. 
+
+Additionally, in a completely isolated parallel path, if no progress is made by the ASP.NET SignalR team to make the SignalR client freed from jQuery, xio.js might become tailored to be a somewhat code compatible client implementation or a support library for a separate SignalR client implementation.
+
+## Other notes
 
 If you run the Jasmine tests, make sure the .json file type is set up as a mime type. For example, IIS and IIS Express will return a 403 otherwise. Google reveals this: http://michaellhayden.blogspot.com/2012/07/add-json-mime-type-to-iis-express.html

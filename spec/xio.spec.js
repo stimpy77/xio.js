@@ -7,6 +7,12 @@ describe("xio", function() {
     describe("xiospec", function() {
         it("should init", function() {
             expect(this).toBeDefined();
+            $.ajax("spec/svr/KeyValueStore?method=clear", {
+                type: "POST",
+                async: false
+            }).error(function (x,t,e) {
+                alert(e);
+            });
         });
     });
 
@@ -236,12 +242,78 @@ describe("xio", function() {
 
     ////////////////////////////////////////////////////////////////////////
 
-    describe("xio.defineRoute()", function() {
+    describe("xio.define()", function() {
         it("should allow me to define a route", function() {
             xio.define("fakeroute", {
                 url: "ignore/this",
                 methods: [xio.verbs.get]
             });
+            expect(xio.get.fakeroute).not.toBeFalsy();
+            expect(typeof (xio.get.fakeroute)).toBe("function");
+        });
+
+        it("should return a set of methods that can be invoked as functions", function () {
+            var definition = xio.define("threemethods", {
+                methods: [xio.verbs.get, xio.verbs.post, xio.verbs.put]
+            });
+            expect(definition).not.toBeFalsy();
+            expect(typeof (definition.get)).toBe("function");
+            expect(typeof (definition.post)).toBe("function");
+            expect(typeof (definition.put)).toBe("function");
+            expect(definition.delete).toBeFalsy();
+        });
+
+        it("should allow me to declare my own implementation", function () {
+            var getcalled, postcalled, putcalled, deletecalled;
+            var def = xio.define("myownthree", {
+                "get": function (key) { getcalled = key=="a"; },
+                "post": function (key, value) { postcalled = key=="b" && value=="c"; },
+                "put": function (key, value) { putcalled = key=="d" && value=="e"; },
+                "delete": function (key) { deletecalled = key=="f"; }
+            });
+            def.get("a");
+            expect(getcalled).toBe(true);
+            expect(postcalled).toBeFalsy();
+            expect(putcalled).toBeFalsy();
+            expect(deletecalled).toBeFalsy();
+            def.post("b", "c");
+            expect(postcalled).toBe(true);
+            expect(putcalled).toBeFalsy();
+            expect(deletecalled).toBeFalsy();
+            def.put("d", "e");
+            expect(putcalled).toBe(true);
+            expect(deletecalled).toBeFalsy();
+            def["delete"]("f");
+            expect(deletecalled).toBe(true);
+        });
+
+        it("should allow me to re-declare an implementation", function () {
+            var definition1 = xio.define("threemethods2", {
+                methods: [xio.verbs.get, xio.verbs.post, xio.verbs.put]
+            });
+            expect(definition1.get).not.toBeFalsy();
+            expect(definition1.put).not.toBeFalsy();
+            var definition2 = xio.redefine("threemethods2", {
+                methods: [xio.verbs.get, xio.verbs.post]
+            });
+            expect(definition2.get).not.toBeFalsy();
+            expect(definition2.put).toBeFalsy();
+        });
+
+        it("should allow me to redefine a single verb implementation", function () {
+            var definition1 = xio.define("threemethods3", {
+                methods: [xio.verbs.get, xio.verbs.post, xio.verbs.put]
+            });
+            var def1_get = definition1.get;
+            var def1_put = definition1.put;
+            expect(def1_put).not.toBeFalsy();
+            var executed = false;
+            var myNewPutDef = function (key, value) { executed = true; };
+            var definition2 = xio.redefine("threemethods3", xio.verbs.put, myNewPutDef);
+            expect(definition2.get).toBe(def1_get);
+            expect(definition2.put).not.toBe(def1_put);
+            definition2.put("a", "b");
+            expect(executed).toBe(true);
         });
     });
 
@@ -352,10 +424,12 @@ describe("xio", function() {
                 var key = "post1";
                 var value = "val1";
                 var result;
+                var state;
                 xio.post.keyvaluestore(key, value).success(function (retval) {
                     $.getJSON("spec/svr/KeyValueStore/" + key, function(v) {
                         result = v;
                         expect(result).toBe(value);
+                        state = "success";
                         
                         // cleanup
                         $.ajax("spec/svr/KeyValueStore/" + key + "?method=DELETE", {
@@ -364,13 +438,19 @@ describe("xio", function() {
                     }).fail(function() {
                         result = "error";
                         expect(result).not.toBe("error");
+                        state = "fail";
                     });
 
                 })
                 .error(function (error) {
                     result = "error";
                     expect(result).not.toBe("error");
+                    state = "fail";
                 });
+
+                waitsFor(function () {
+                    return state !== undefined;
+                }, "unknown failure (timeout)", 500);
             });
 
             it("should post model to a route", function () {
@@ -386,8 +466,8 @@ describe("xio", function() {
                 xio.post.keyvaluestore2(key, model)
                     .success(function(newkey) {
                         key = newkey;
-                        $.getJSON("spec/svr/KeyValueStore/" + key, function(v) {
-                            result = v;
+                        $.getJSON("spec/svr/KeyValueStore/" + key, function (v) {
+                            result = typeof(v) == "string" ? JSON.parse(v) : v;
                             expect(result).not.toBeFalsy();
                             expect(result.akey).toBe("avalue");
 
@@ -411,6 +491,152 @@ describe("xio", function() {
                     return state !== undefined;
                 }, "unknown failure (timeout)", 500);
             });
+        });
+
+        describe("xio.put.xhr", function () {
+
+
+            it("should put string to a route", function () {
+                var v = xio.verbs;
+                xio.define("keyvaluestore_puttest1", {
+                    url: "spec/svr/KeyValueStore/{0}",
+                    methods: [v.get, v.post, v.put],
+                    async: false // synchronous
+                });
+                var key = "post1";
+                var value = "val1";
+                var result;
+                var state;
+                xio.post.keyvaluestore_puttest1(key, value).success(function (retval) {
+                    $.getJSON("spec/svr/KeyValueStore/" + key, function (v) {
+                        result = v;
+                        expect(result).toBe(value);
+                        state = "success";
+
+                        value = "val2";
+
+                        xio.put.keyvaluestore_puttest1(key, value).success(function (retval) {
+                            $.getJSON("spec/svr/KeyValueStore/" + key, function (v) {
+                                result = v;
+                                expect(result).toBe(value);
+                            }).fail(function () {
+                                result = "error";
+                                expect(result).not.toBe("error");
+                            }).complete(function() {
+                                // cleanup
+                                $.ajax("spec/svr/KeyValueStore/" + key + "?method=DELETE", {
+                                    type: "DELETE"
+                                });
+                                state = "complete";
+                            });
+
+                        })
+                        .error(function (error) {
+                            result = "error";
+                            expect(result).not.toBe("error");
+                            state = "error";
+                        });
+
+                    }).fail(function () {
+                        result = "error";
+                        expect(result).not.toBe("error");
+                        state = "fail";
+                    });
+
+                })
+                .error(function (error) {
+                    result = "error";
+                    expect(result).not.toBe("error");
+                    state = "error";
+                });
+
+                waitsFor(function () {
+                    return state !== undefined;
+                }, "unknown failure (timeout)", 1000);
+            });
+
+            it("should put model to a route", function () {
+                var v = xio.verbs;
+                xio.define("keyvaluestore_puttest2", {
+                    url: "spec/svr/KeyValueStore/{0}",
+                    methods: [v.get, v.post, v.put]
+                });
+                var key = 0; // hack, would prefer null to generate "" but the server side test doesn't resolve the route
+                var model = { akey: "avalue" };
+                var result;
+                var state;
+                xio.post.keyvaluestore_puttest2(key, model)
+                    .success(function (newkey) {
+                        key = newkey;
+                        $.getJSON("spec/svr/KeyValueStore/" + key, function (v) {
+                            result = typeof (v) == "string" ? JSON.parse(v) : v;
+                            expect(result).not.toBeFalsy();
+                            expect(result.akey).toBe("avalue");
+
+                            model.akey = "newvalue";
+                            xio.put.keyvaluestore_puttest2(key, model)
+                                .success(function () {
+                                    $.getJSON("spec/svr/KeyValueStore/" + key, function (v) {
+                                        result = typeof (v) == "string" ? JSON.parse(v) : v;
+                                        expect(result).not.toBeFalsy();
+                                        expect(result.akey).toBe("newvalue");
+                                        status = "success";
+                                    });
+                                }).complete(function () {
+                                    // cleanup
+                                    $.ajax("spec/svr/KeyValueStore/" + key + "?method=DELETE", {
+                                        type: "DELETE"
+                                    });
+                                });
+                        }).fail(function () {
+                            result = "error";
+                            expect(result).not.toBe("error");
+                        });
+                        state = "success";
+                    })
+                    .error(function (error) {
+                        result = "error";
+                        expect(result).not.toBe("error");
+                        state = "error";
+                    });
+
+                waitsFor(function () {
+                    return state === "success";
+                }, "unknown failure (timeout)", 500);
+            });
+        });
+
+        describe("xio.delete.xhr", function () {
+
+            it("should delete from server", function () {
+                var v = xio.verbs;
+                xio.define("keyvaluestore3", {
+                    url: "spec/svr/KeyValueStore/{0}",
+                    methods: [v.delete]
+                });
+
+                $.ajax("/spec/svr/KeyValueStore/deletetest", {
+                    type: "POST",
+                    data: "this is a value",
+                    async: false
+                });
+
+                var state;
+                var result;
+                xio.delete.keyvaluestore3("deletetest").complete(function () {
+                    $.getJSON("/spec/svr/KeyValueStore/deletetest").success(function (v) {
+                        result = v;
+                    }).complete(function () {
+                        state = "complete";
+                        expect(result).toBeFalsy();
+                    });
+                });
+
+                waitsFor(function () {
+                    return state !== undefined;
+                }, "unknown failure (timeout)", 700);
+            });
+
         });
     });
 

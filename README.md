@@ -119,11 +119,11 @@ Note that using this approach, while more expressive and potentially more conver
         });
     });
 
-#### web server resource (DELETE) (todo; not yet tested/implemetned)
+#### web server resource (DELETE)
 
     xio.delete.myresourceContainer("myresource");
 
-#### web server resource (PUT) (todo; not yet tested/implemetned)
+#### web server resource (PUT)
 
     xio.define("contactsvc", {
                     url: "svcapi/contact/{0}",
@@ -164,6 +164,21 @@ Note that using this approach, while more expressive and potentially more conver
         xio.patch.contactsvc(id, myModification).success(function() {  /* .. */ }).error(function() { /* .. */ });
     });
 
+#### custom implementation and redefinition
+
+    xio.define("custom1", {
+	    get: function(key) { return "teh value for " + key};
+	});
+	xio.get.custom1("tehkey").success(function(v) { alert(v); } ); // alerts "teh value for tehkey";
+    xio.redefine("custom1", xio.verbs.get, function(key) { return "teh better value for " + key; });
+	xio.get.custom1("tehkey").success(function(v) { alert(v); } ); // alerts "teh better value for tehkey"
+	xio.redefine("custom1", {
+	    url: "customurl/{0}",
+	    methods: [xio.verbs.post],
+		get: function(key) { return "custom getter still"; }
+	});
+	xio.post.custom1("tehkey", "val"); // asynchronously posts to URL http://host_server/customurl/tehkey
+	xio.get.custom1("tehkey").success(function(v) { alert(v); } ); // alerts "custom getter still"
 
 ## Dependencies
 

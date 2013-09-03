@@ -46,7 +46,10 @@ Synchronous convention: `var val = xio.get.local('mykey')();`
 
 Whenever a new repository is defined using XIO, a set of supported verb and their implemented functions is returned and can be used as a repository object. For example:
 
-    var myRepository = xio.define('myRepository', { url: '/myRepository?key={0}', methods: ["GET", "POST", "PUT", "DELETE"]});
+    var myRepository = xio.define('myRepository', { 
+        url: '/myRepository?key={0}',
+        methods: ["GET", "POST", "PUT", "DELETE"]
+    });
 
 .. would populate the variable `myRepository` with:
 

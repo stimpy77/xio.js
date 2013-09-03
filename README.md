@@ -45,13 +45,13 @@ Download here: https://raw.github.com/stimpy77/xio.js/master/src/xio.js
 
 .. and to run the Jasmine tests, you will need Visual Studio 2012 and a registration of the .json file type with IIS / IIS Express MIME types. Open the xio.js.csproj file.
 
-## Dependencies
+### Dependencies
 
 jQuery is required for now, for XHR-based operations, so it's not quite ready for node.js. This dependency requirement might be dropped in the future.
 
 ### Basic verbs
 
-See xio.verbs:
+See `xio.verbs`:
 
 - get(key)
 - set(key, value); used only by localStorage, sessionStorage, and cookie

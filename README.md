@@ -8,6 +8,8 @@ A consistent data repository strategy for local and remote resources.
 
 xio.js is a library that enables you to read and write data to/from data stores and remote servers using a consistent interface convention. It enables you to write code that can be more easily migrated between storage locations and/or URIs.
 
+It supports localStorage, sessionStorage, cookies, and RESTful AJAX calls, using the same interface and conventions.
+
 The convention is a bit unique using `xio[action][repository](key, value)` (i.e. `xio.post.myrepository("mykey", {first: "Bob"})`, and always returns a promise. When the action is synchronous, such as in working with localStorage, it returns a "synchronous promise" which is essentially a function that can be immediately invoked and it will wrap `.success(value)` and return the value.
 
 This convention, with the verb preceding the repository, is different from the usual convention of `_object.method(key, value)`.

@@ -10,6 +10,18 @@ xio.js is a Javascript resource that supports reading and writing data to/from l
 
 It supports localStorage, sessionStorage, cookies, and RESTful AJAX calls, using the same interface and conventions.
 
+### Optionally asynchronous
+
+Whether you're working with localStorage or an XHR resource, each operation returna [promise](http://martinfowler.com/bliki/JavascriptPromise.html).
+
+When the action is synchronous, such as in working with localStorage, it returns a "synchronous promise" which is essentially a function that can optionally be immediately invoked and it will wrap `.success(value)` and return the value.
+
+The examples below are the same, only because XIO knows that the localStorage implementation of get is synchronous.
+
+Aynchronous convention: `var val; xio.get.local('mykey').success(function(v) { val = v; });`
+
+Synchronous convention: `var val = xio.get.local('mykey')();`
+
 ### Generated operation interfaces
 
 Whenever a new repository is defined using XIO, a set of supported verb and their implemented functions is returned and can be used as a repository object. For example:
@@ -26,8 +38,6 @@ Whenever a new repository is defined using XIO, a set of supported verb and thei
     }
 
 .. and each of these would return a [promise](http://martinfowler.com/bliki/JavascriptPromise.html).
-
-When the action is synchronous, such as in working with localStorage, it returns a "synchronous promise" which is essentially a function that can optionally be immediately invoked and it will wrap `.success(value)` and return the value.
 
 ### XIO's optional alternative convention
 

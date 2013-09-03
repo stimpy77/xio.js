@@ -152,6 +152,16 @@
 
         function synchronousPromiseResult(promise) { // bit of a hack to make synchronous operations appear asynchronous
             promise = promise || {};
+            var autocall = function (callback) { callback.call(this); return ret; }; // execute and return my psuedo-promise; also, this?
+            var nocall = function () { return ret; }; // do nothing and return my pseudo-promise
+            var wrapcall = function (callee) { // wrap the promise's handler to return my psuedo-promise
+                return callee
+                    ? function (usercallback) {
+                        callee.call(this, usercallback); // this?
+                        return ret;
+                    }
+                    : null;
+            };
             promise.success = promise.success || nocall;
             var ret;
             ret = function () {
@@ -171,16 +181,6 @@
                     }
                 }
                 return result;
-            };
-            var autocall = function (callback) { callback.call(this); return ret; }; // execute and return my psuedo-promise; also, this?
-            var nocall = function () { return ret; }; // do nothing and return my pseudo-promise
-            var wrapcall = function (callee) { // wrap the promise's handler to return my psuedo-promise
-                return callee
-                    ? function (usercallback) {
-                        callee.call(this, usercallback); // this?
-                        return ret;
-                    }
-                    : null;
             };
             ret.success = wrapcall(promise.success) || nocall;
             ret.error = wrapcall(promise.error) || nocall;

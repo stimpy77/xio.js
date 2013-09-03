@@ -142,7 +142,7 @@ Where the `methods` property is defined as an array of "GET", "POST", etc, for e
 
 The rest of the options are used, for now, as a jQuery's $.ajax(..., `options`) parameter. The `async` property defaults to false. When `async` is `true`, the returned promise is wrapped with a "synchronous promise", which you can *optionally* immediately invoke with parens (`()`) which will return the value that is normally passed into `.success(function (value) { .. }`.
 
-In this example, `define_result` is an object that looks like this:
+In the above example, `define_result` is an object that looks like this:
 
     {
 	    get: function(key) { /* .. */ },

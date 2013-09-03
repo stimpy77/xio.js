@@ -43,7 +43,7 @@ Download here: https://raw.github.com/stimpy77/xio.js/master/src/xio.js
 
 ### To use the whole package (by cloning this repository)
 
-.. and to run the Jasmine tests, you will need Visual Studio 2012 and a registration of the .json file type with IIS / IIS Express MIME types.
+.. and to run the Jasmine tests, you will need Visual Studio 2012 and a registration of the .json file type with IIS / IIS Express MIME types. Open the xio.js.csproj file.
 
 ## Dependencies
 

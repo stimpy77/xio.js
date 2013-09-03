@@ -18,12 +18,17 @@ To write and read to and from a session cookie,
     xio.set.cookie("mykey", "myvalue");
     xio.get.cookie("mykey", "myvalue")();
     
-To write and read to and from a web service (as optionally synchronous),
+To write and read to and from a web service (as optionally synchronous; see below),
 
     xio.post.mywebservice("mykey", "myvalue");
     xio.get.mywebservice("mykey", "myvalue")();
 
 See the pattern? It supports localStorage, sessionStorage, cookies, and RESTful AJAX calls, using the same interface and conventions.
+
+It also supports generating XHR functions and providing implementations that look like:
+
+    mywebservice.post("mykey", "myvalue");
+    mywebservice.get("mykey", "myvalue")(); // assumes synchronous; see below
 
 ### Optionally synchronous (asynchronous by default)
 

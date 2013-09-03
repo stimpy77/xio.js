@@ -100,9 +100,9 @@ See xio.verbs:
 	
 .. supports these arguments: `(key, value, expires, path, domain)`
 
-Alternatively, retaining only the `xio.set[target](key, value)`, you can automatically returned helper replacer functions:
+Alternatively, retaining only the `xio.set["cookie"](key, value)`, you can automatically returned helper replacer functions:
 
-    xio.set[target](skey, svalue)
+    xio.set["cookie"](skey, svalue)
         .expires(Date.now() + 30 * 24 * 60 * 60000))
         .path("/")
         .domain("mysite.com");

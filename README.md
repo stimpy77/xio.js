@@ -149,7 +149,7 @@ When `async` is `true`, the returned promise is wrapped with a "synchronous prom
 	   // ..
 	});
 
-In this example, the `get()` and `post()` operations are explicitly declared into the defined verb handler and wrapped with a promise, rather than internally wrapped into XHR/AJAX calls. You can mix-and-match both generated XHR calls (with the `methods` property) as well as custom implementations (with explicit `get`/`post`/etc properties) in the options argument; custom implementations will override any generated implementations if they conflict.
+In this example, the `get()` and `post()` operations are explicitly declared into the defined verb handler and wrapped with a promise, rather than internally wrapped into XHR/AJAX calls. You can mix-and-match both generated XHR calls (with the `methods` property) as well as custom implementations (with explicit `get`/`post`/etc properties) in the options argument. Custom implementations will override any generated implementations if they conflict.
 
 #### web server resource (asynchronous GET)
 

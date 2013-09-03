@@ -10,12 +10,12 @@ xio.js is a Javascript resource that supports reading and writing data to/from l
 
 To write and read to and from local storage,
     
-    xio.post.local("mykey", "myvalue");
+    xio.set.local("mykey", "myvalue");
     xio.get.local("mykey", "myvalue")();
     
 To write and read to and from a session cookie,
 
-    xio.post.cookie("mykey", "myvalue");
+    xio.set.cookie("mykey", "myvalue");
     xio.get.cookie("mykey", "myvalue")();
     
 To write and read to and from a web service (as optionally synchronous),

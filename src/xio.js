@@ -2,9 +2,11 @@
 // http://github.com/stimpy77/xio.js
 // version 0.1.1
 // send feedback to jon@jondavis.net
-(function ($) {
 
-    (window || exports).Xio = function () {
+var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
+(function ($, JSON) {
+    var globals = this; // window || exports
+    globals.Xio = function () {
         if (!$) throw "jQuery must be referenced before xio.js is loaded.";
 
         function formatKey(key) {
@@ -37,8 +39,8 @@
                 catch (error) { }
             }
             return result !== undefined && result !== null
-                ? synchronousPromiseResult({ success: function (callback) { callback.call(this, result); } })
-                : synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });
+                ? synchronousPromiseResult({ success: function (callback) { callback.call(this, result); } })       // this?
+                : synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });   // this?
         }
 
         function localDeleteDefinition(key) {
@@ -52,9 +54,9 @@
             if (data !== null && data !== undefined) {
                 var newdata = patchData(data, patchdata);
                 localSetDefinition(key, newdata);
-                return synchronousPromiseResult({ success: function(callback) { callback.call(this, newdata); } });
+                return synchronousPromiseResult({ success: function (callback) { callback.call(this, newdata); } });    // this?
             } else {
-                return synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });
+                return synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });  // this?
             }
         }
 
@@ -65,7 +67,7 @@
                 (data.indexOf("[") == 0 && data.indexOf("]") == data.length - 1))) {
                 try {
                     data = parseJSON(data);
-                } catch(error) { }
+                } catch (error) { }
             }
 
             if (typeof (data) == "object" && patchdata && typeof (patchdata) == "object") {
@@ -98,8 +100,8 @@
                 catch (error) { }
             }
             return result !== undefined && result !== null
-                ? synchronousPromiseResult({ success: function (callback) { callback.call(this, result); } })
-                : synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });
+                ? synchronousPromiseResult({ success: function (callback) { callback.call(this, result); } })       // this?
+                : synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });   // this?
         }
 
         function sessionDeleteDefinition(key) {
@@ -113,9 +115,9 @@
             if (data !== null && data !== undefined) {
                 var newdata = patchData(data, patchdata);
                 sessionSetDefinition(key, newdata);
-                return synchronousPromiseResult({ success: function (callback) { callback.call(this, newdata); } });
+                return synchronousPromiseResult({ success: function (callback) { callback.call(this, newdata); } });    // this?
             } else {
-                return synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });
+                return synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });  // this?
             }
         }
 
@@ -188,8 +190,8 @@
                 catch (error) { }
             }
             return result
-                ? synchronousPromiseResult({ success: function (callback) { callback.call(this, result); } })
-                : synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });
+                ? synchronousPromiseResult({ success: function (callback) { callback.call(this, result); } })       // this?
+                : synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });   // this?
         }
 
         function cookiePatchDefinition(key, patchdata) {
@@ -198,9 +200,9 @@
             if (data !== null && data !== undefined) {
                 var newdata = patchData(data, patchdata, true);
                 cookieSetDefinition(key, newdata);
-                return synchronousPromiseResult({ success: function (callback) { callback.call(this, newdata); } });
+                return synchronousPromiseResult({ success: function (callback) { callback.call(this, newdata); } });    // this?
             } else {
-                return synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });
+                return synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });  // this?
             }
         }
 
@@ -279,7 +281,7 @@
             session: sessionDeleteDefinition,
             cookie: cookieDeleteDefinition
         };
-        
+
         // patch
         var patchDefinitions = {
             local: localPatchDefinition,
@@ -483,4 +485,5 @@
         };
     };
 
-})(jQuery);
+}).apply(this, __xiodependencies);
+__xiodependencies = undefined; // cleanup

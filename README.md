@@ -1,6 +1,6 @@
 XIO (xio.js)
 ======
-version 0.1.1 initial prototype (all 36-or-so tests pass)
+version 0.1.1 initial prototype (all 39-or-so tests pass)
 
 A consistent data repository strategy for local and remote resources.
 
@@ -118,7 +118,7 @@ See `xio.verbs`:
 
     // initialize
 
-	var xio = (window || exports).Xio(); // initialize a module instance named "xio";
+	var xio = Xio(); // initialize a module instance named "xio";
 
 #### localStorage
 

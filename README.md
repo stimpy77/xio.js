@@ -352,8 +352,8 @@ Meanwhile, jQuery needs to be replaced with something that works fine on nodejs.
 Additionally, in a completely isolated parallel path, if no progress is made by the ASP.NET SignalR team to make the SignalR client freed from jQuery, xio.js might become tailored to be a somewhat code compatible client implementation or a support library for a separate SignalR client implementation.
 
 ### Service Bus, Queuing, and background tasks support
-
-At an extremely lightweight scale, I do want to implement some service bus and queue features. For remote service integration, this would just be more verbs to sit on top of the existing CRUD operations, as well as WebSockets / long polling / SignalR integration. This is all fairly vague right now because I am not sure yet what it will look like. On a local level, however, I am considering integrating with Web Workers. It might be nice to use XIO to manage deferred local I/O. There are major limitations to Web Workers, however, such as no access to the DOM, so I am not sure yet.
+ 
+At an extremely lightweight scale, I do want to implement some service bus and queue features. For remote service integration, this would just be more verbs to sit on top of the existing CRUD operations, as well as WebSockets / long polling / SignalR integration. This is all fairly vague right now because I am not sure yet what it will look like. On a local level, however, I am considering integrating with [Web Workers](https://developer.mozilla.org/en-US/docs/Web/Guide/Performance/Using_web_workers). It might be nice to use XIO to manage deferred I/O via the Web Workers feature. There are major limitations to Web Workers, however, such as no access to the DOM, so I am not sure yet.
 
 ## Other notes
 

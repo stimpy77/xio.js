@@ -112,7 +112,7 @@ See `xio.verbs`:
 - put(key, data); defaults to "set" behavior when using localStorage, sessionStorage, or cookie
 - post(key, data); defaults to "set" behavior when using localStorage, sessionStorage, or cookie
 - delete(key)
-- et al; HTTP verbs would apply
+- patch(key, patchdata); implemented based on JSON/Javascript literals field sets (send only deltas)
 
 ### Examples
 

@@ -1,6 +1,6 @@
 // xio.js
 // http://github.com/stimpy77/xio.js
-// version 0.1.0
+// version 0.1.1
 // send feedback to jon@jondavis.net
 (function ($) {
 
@@ -46,7 +46,37 @@
             localStorage.removeItem(key);
         }
 
+        function localPatchDefinition(key, patchdata) {
+            key = formatKey(key);
+            var data = localStorage.getItem(key);
+            if (data !== null && data !== undefined) {
+                var newdata = patchData(data, patchdata);
+                localSetDefinition(key, newdata);
+                return synchronousPromiseResult({ success: function(callback) { callback.call(this, newdata); } });
+            } else {
+                return synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });
+            }
+        }
 
+        function patchData(unparsed, patchdata, preparsed) {
+            var data = unparsed;
+            if (data && !preparsed && (
+                (data.indexOf("{") == 0 && data.indexOf("}") == data.length - 1) ||
+                (data.indexOf("[") == 0 && data.indexOf("]") == data.length - 1))) {
+                try {
+                    data = parseJSON(data);
+                } catch(error) { }
+            }
+
+            if (typeof (data) == "object" && patchdata && typeof (patchdata) == "object") {
+                for (var p in patchdata) {
+                    if (patchdata.hasOwnProperty(p)) {
+                        data[p] = patchdata[p];
+                    }
+                }
+            }
+            return data;
+        }
 
         // sessionStorage
         function sessionSetDefinition(key, value) {
@@ -75,6 +105,18 @@
         function sessionDeleteDefinition(key) {
             key = formatKey(key);
             sessionStorage.removeItem(key);
+        }
+
+        function sessionPatchDefinition(key, patchdata) {
+            key = formatKey(key);
+            var data = sessionStorage.getItem(key);
+            if (data !== null && data !== undefined) {
+                var newdata = patchData(data, patchdata);
+                sessionSetDefinition(key, newdata);
+                return synchronousPromiseResult({ success: function (callback) { callback.call(this, newdata); } });
+            } else {
+                return synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });
+            }
         }
 
 
@@ -148,6 +190,18 @@
             return result
                 ? synchronousPromiseResult({ success: function (callback) { callback.call(this, result); } })
                 : synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });
+        }
+
+        function cookiePatchDefinition(key, patchdata) {
+            key = formatKey(key);
+            var data = cookieGetDefinition(key)();
+            if (data !== null && data !== undefined) {
+                var newdata = patchData(data, patchdata, true);
+                cookieSetDefinition(key, newdata);
+                return synchronousPromiseResult({ success: function (callback) { callback.call(this, newdata); } });
+            } else {
+                return synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });
+            }
         }
 
         function synchronousPromiseResult(promise) { // bit of a hack to make synchronous operations appear asynchronous
@@ -225,13 +279,21 @@
             session: sessionDeleteDefinition,
             cookie: cookieDeleteDefinition
         };
+        
+        // patch
+        var patchDefinitions = {
+            local: localPatchDefinition,
+            session: sessionPatchDefinition,
+            cookie: cookiePatchDefinition
+        };
 
         var verbHandles = {
             "put": putDefinitions,
             "set": setDefinitions,
             "get": getDefinitions,
             "delete": deleteDefinitions,
-            "post": postDefinitions
+            "post": postDefinitions,
+            "patch": patchDefinitions
         };
 
         // routing and actions
@@ -243,6 +305,38 @@
             "patch": "PATCH"
             // etc etc
         };
+
+        function isPromise(o) { // a bit of a hack? is this what constitutes a promise?
+            if (typeof (o) !== "object") return false;
+            if (!o.success || typeof (o.success) !== "function") return false;
+            if (!o.complete || typeof (o.complete) !== "function") return false;
+            return true;
+        }
+
+        function formatString(str) {
+            if (/\{\d+\}/.test(str)) {
+                for (var i = 1; i < arguments.length; i++) {
+                    var arg = encodeURIComponent(arguments[i].toString());
+                    str = str.replace(new RegExp("\\{" + (i - 1) + "\\}", 'g'), arg || "");
+                }
+            }
+            return str;
+        }
+
+        function parseJSON(obj) {
+            if (!JSON || !JSON.stringify) {
+                throw "json2.js is required; please reference it.";
+            }
+            return JSON.parse(obj);
+        }
+
+        function stringify(obj) {
+            if (!JSON || !JSON.stringify) {
+                throw "json2.js is required; please reference it.";
+            }
+            return JSON.stringify(obj);
+        }
+
         var define = function (name, options) {
             var custom = {}, customqty;
             for (var v in verbs) {
@@ -315,37 +409,6 @@
             }
         }
 
-        function isPromise(o) { // a bit of a hack? is this what constitutes a promise?
-            if (typeof (o) !== "object") return false;
-            if (!o.success || typeof (o.success) !== "function") return false;
-            if (!o.complete || typeof (o.complete) !== "function") return false;
-            return true;
-        }
-
-        function formatString(str) {
-            if (/\{\d+\}/.test(str)) {
-                for (var i = 1; i < arguments.length; i++) {
-                    var arg = encodeURIComponent(arguments[i].toString());
-                    str = str.replace(new RegExp("\\{" + (i - 1) + "\\}", 'g'), arg || "");
-                }
-            }
-            return str;
-        }
-
-        function parseJSON(obj) {
-            if (!JSON || !JSON.stringify) {
-                throw "json2.js is required; please reference it.";
-            }
-            return JSON.parse(obj);
-        }
-
-        function stringify(obj) {
-            if (!JSON || !JSON.stringify) {
-                throw "json2.js is required; please reference it.";
-            }
-            return JSON.stringify(obj);
-        }
-
         function createCustomHandler(verb, fn, options) {
             return function (key, data) {
                 var catcherr;
@@ -389,7 +452,7 @@
                 jqoptions.type = method;
                 data = data || jqoptions.data;
                 //if (typeof(data) === "string" && data.indexOf("=") == -1) data = "value=" + data;
-                if (typeof (data) == "object") data = stringify(data);
+                //if (typeof (data) == "object") data = stringify(data);
                 jqoptions.data = data;
                 if (options.async === false) {
                     // return immediately
@@ -407,6 +470,7 @@
             "put": putDefinitions,
             "set": setDefinitions,
             "delete": deleteDefinitions,
+            "patch": patchDefinitions,
 
             "define": define,
             "redefine": redefine,

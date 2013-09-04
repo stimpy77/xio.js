@@ -80,17 +80,23 @@ namespace xio.js.spec
             else  _values[key] = value;
         }
 
-        public object Patch(string key, object value)
+        public object Patch(string key, [FromBody]JObject value)
         {
             if (!_values.ContainsKey(key))
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-            var dynval = (dynamic) value;
-            var item = (dynamic)_values[key];
-            foreach (var field in dynval.Keys)
+            var item = (JObject)_values[key];
+            foreach (var field in value.Properties())
             {
-                item[field] = dynval[field];
+                if (item.Properties().Any(p => p.Name == field.Name))
+                {
+                    item.Property(field.Name).Value = value.Property(field.Name).Value;
+                }
+                else
+                {
+                    item.Add(field.Name, value.Property(field.Name).Value);
+                }
             }
             return item;
         }

@@ -1,6 +1,6 @@
 XIO (xio.js)
 ======
-version 0.1.0 initial prototype (all 35-or-so tests pass)
+version 0.1.1 initial prototype (all 36-or-so tests pass)
 
 A consistent data repository strategy for local and remote resources.
 
@@ -132,9 +132,6 @@ See `xio.verbs`:
         val = v;
     });
 
-The following is a plan-to-have ..
-
-    // PATCH support!? (todo; not yet implemented)
     xio.set.local("my_key", {
         first: "Bob",
         last: "Jones"
@@ -297,7 +294,7 @@ In this example, the `get()` and `post()` operations are explicitly declared int
         xio.put.contactsvc(id, myModel).success(function() {  /* .. */ }).error(function() { /* .. */ });
     });
 
-#### web server resource (PATCH) (todo; not yet tested/implemetned)
+#### web server resource (PATCH)
 
     xio.define("contactsvc", {
                     url: "svcapi/contact/{0}",
@@ -343,9 +340,6 @@ In this example, the `get()` and `post()` operations are explicitly declared int
 
 ## Future intentions
 
-### PATCH support
-
-See documentation above, there are to-do notes in there.
 
 ### WebSockets and WebRTC support
 

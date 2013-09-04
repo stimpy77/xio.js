@@ -134,6 +134,25 @@ describe("xio", function() {
             });
         });
 
+        describe("xio.patch.local", function () {
+            it("should patch a model being provided only subset of fields; other fields should be retained", function () {
+                var key = Date.now().toString();
+                var data = {
+                    first: "Billy",
+                    last: "Bob"
+                };
+                localStorage.setItem(key, JSON.stringify(data));
+                
+                data = { last: "Joe" };
+
+                xio.patch.local(key, data).success(function(v) {
+                    expect(v).not.toBeFalsy();
+                    expect(v.last).toBe("Joe");
+                    expect(v.first).toBe("Billy");
+                });
+            });
+        });
+
     });
 
     ////////////////////////////////////////////////////////////////////////
@@ -197,6 +216,25 @@ describe("xio", function() {
                 xio["delete"][fromSource](key);
                 var result = sessionStorage.getItem(key);
                 expect(result).toBeFalsy();
+            });
+        });
+
+        describe("xio.patch.session", function () {
+            it("should patch a model being provided only subset of fields; other fields should be retained", function () {
+                var key = Date.now().toString();
+                var data = {
+                    first: "Billy",
+                    last: "Bob"
+                };
+                sessionStorage.setItem(key, JSON.stringify(data));
+
+                data = { last: "Joe" };
+
+                xio.patch.session(key, data).success(function (v) {
+                    expect(v).not.toBeFalsy();
+                    expect(v.last).toBe("Joe");
+                    expect(v.first).toBe("Billy");
+                });
             });
         });
 
@@ -301,6 +339,25 @@ describe("xio", function() {
                 xio["delete"][fromSource](key);
                 result = document.cookie;
                 expect(result).not.toContain(encodeURIComponent(key) + "=" + encodeURIComponent(value));
+            });
+        });
+
+        describe("xio.patch.cookie", function () {
+            it("should patch a model being provided only subset of fields; other fields should be retained", function () {
+                var key = Date.now().toString();
+                var data = {
+                    first: "Billy",
+                    last: "Bob"
+                };
+                document.cookie = encodeURIComponent(key) + "=" + encodeURIComponent(JSON.stringify(data));
+
+                data = { last: "Joe" };
+
+                xio.patch.cookie(key, data).success(function (v) {
+                    expect(v).not.toBeFalsy();
+                    expect(v.last).toBe("Joe");
+                    expect(v.first).toBe("Billy");
+                });
             });
         });
     });
@@ -654,7 +711,7 @@ describe("xio", function() {
                                         result = typeof (v) == "string" ? JSON.parse(v) : v;
                                         expect(result).not.toBeFalsy();
                                         expect(result.akey).toBe("newvalue");
-                                        status = "success";
+                                        state = "success";
                                     });
                                 }).complete(function () {
                                     // cleanup
@@ -711,6 +768,42 @@ describe("xio", function() {
                 }, "unknown failure (timeout)", 700);
             });
 
+        });
+
+        describe("xio.patch.xhr", function() {
+            it("should patch a model being provided only subset of fields; other fields should be retained", function() {
+                var key = Date.now().toString();
+                var state;
+                var data = {
+                    first: "Billy",
+                    last: "Bob"
+                };
+                $.post("spec/svr/KeyValueStore/" + key, data, function (r) {
+                    data = { last: "Joe" };
+
+                    var v = xio.verbs;
+                    xio.define("patchtest", {
+                        url: "spec/svr/KeyValueStore/{0}",
+                        methods: [v.patch],
+                        dataType: "json"
+                    });
+                    
+                    xio.patch.patchtest(key, data).success(function(r2) {
+
+                        $.getJSON("spec/svr/KeyValueStore/" + key, function (v) {
+                            state = "success";
+                            expect(v).not.toBeFalsy();
+                            expect(v.last).toBe("Joe");
+                            expect(v.first).toBe("Billy");
+                        });
+
+                    });
+                });
+
+                waitsFor(function () {
+                    return state !== undefined;
+                }, "unknown failure (timeout)", 700);
+            });
         });
     });
 

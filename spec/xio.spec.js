@@ -752,7 +752,7 @@ describe("xio", function() {
                     url: "spec/svr/KeyValueStore/{0}",
                     methods: [v.get, v.post, v.put]
                 });
-                var key = 0; // hack, would prefer null to generate "" but the server side test doesn't resolve the route
+                var key = 0; // hack, would prefer null to generate "" for placeholder but the server side test doesn't resolve the route
                 var model = { akey: "avalue" };
                 var result;
                 var state;

@@ -243,7 +243,7 @@ In this example, the `get()` and `post()` operations are explicitly declared int
                     dataType: 'json'
                 });
     var val;
-    xio.get.specresource("myResourceAction").success(function(v) { // gets http://host_server/spec/res/myResourceAction
+    xio.get.specresource("myResourceAction" /* can also put success and error callbacks as final params */ ).success(function(v) { // gets http://host_server/spec/res/myResourceAction
         val = v;
     }).complete(function() {
         // continue processing with populated val
@@ -270,12 +270,13 @@ In this example, the `get()` and `post()` operations are explicitly declared int
         first: "Fred",
         last: "Flinstone"
     }
-    var val = xio.post.contactsvc(null, myModel).success(function(id) { // posts to http://host_server/svcapi/contact/
-        // model has been posted, new ID returned
-        // validate:
-        xio.get.contactsvc(id).success(function(contact) {  // gets from http://host_server/svcapi/contact/{id}
-            expect(contact.first).toBe("Fred");
-        });
+    var val = xio.post.contactsvc(null, myModel /* can also put success and error callbacks as final params */ )
+	    .success(function(id) { // posts to http://host_server/svcapi/contact/
+            // model has been posted, new ID returned
+            // validate:
+            xio.get.contactsvc(id).success(function(contact) {  // gets from http://host_server/svcapi/contact/{id}
+                expect(contact.first).toBe("Fred");
+            });
     });
 
 #### web server resource (DELETE)
@@ -293,15 +294,16 @@ In this example, the `get()` and `post()` operations are explicitly declared int
         first: "Fred",
         last: "Flinstone"
     }
-    var val = xio.post.contactsvc(null, myModel).success(function(id) { // posts to http://host_server/svcapi/contact/
-        // model has been posted, new ID returned
-        // now modify:
-		myModel = {
-            first: "Carl",
-            last: "Zeuss"
-        }
-        xio.put.contactsvc(id, myModel).success(function() {  /* .. */ }).error(function() { /* .. */ });
-    });
+    var val = xio.post.contactsvc(null, myModel /* can also put success and error callbacks as final params */ )
+	    .success(function(id) { // posts to http://host_server/svcapi/contact/
+            // model has been posted, new ID returned
+            // now modify:
+		    myModel = {
+                first: "Carl",
+                last: "Zeuss"
+            };
+            xio.put.contactsvc(id, myModel).success(function() {  /* .. */ }).error(function() { /* .. */ });
+        });
 
 #### web server resource (PATCH)
 
@@ -314,14 +316,15 @@ In this example, the `get()` and `post()` operations are explicitly declared int
         first: "Fred",
         last: "Flinstone"
     }
-    var val = xio.post.contactsvc(null, myModel).success(function(id) { // posts to http://host_server/svcapi/contact/
-        // model has been posted, new ID returned
-        // now modify:
-		var myModification = {
-            first: "Phil" // leave the last name intact
-        }
-        xio.patch.contactsvc(id, myModification).success(function() {  /* .. */ }).error(function() { /* .. */ });
-    });
+    var val = xio.post.contactsvc(null, myModel /* can also put success and error callbacks as final params */ )
+	    .success(function(id) { // posts to http://host_server/svcapi/contact/
+            // model has been posted, new ID returned
+            // now modify:
+		    var myModification = {
+                first: "Phil" // leave the last name intact
+            }
+            xio.patch.contactsvc(id, myModification).success(function() {  /* .. */ }).error(function() { /* .. */ });
+        });
 
 #### client-side HTTP cache invalidation
 
@@ -338,9 +341,9 @@ In the event an HTTP response from an XHR response is cached, the items are inva
     xio.define("custom1", {
 	    get: function(key) { return "teh value for " + key};
 	});
-	xio.get.custom1("tehkey").success(function(v) { alert(v); } ); // alerts "teh value for tehkey";
+	xio.get.custom1("tehkey", function(v) { alert(v); } ); // alerts "teh value for tehkey";
     xio.redefine("custom1", xio.verbs.get, function(key) { return "teh better value for " + key; });
-	xio.get.custom1("tehkey").success(function(v) { alert(v); } ); // alerts "teh better value for tehkey"
+	xio.get.custom1("tehkey", function(v) { alert(v); } ); // alerts "teh better value for tehkey"
 	var custom1 = 
 	    xio.redefine("custom1", {
 			url: "customurl/{0}",
@@ -348,7 +351,7 @@ In the event an HTTP response from an XHR response is cached, the items are inva
 			get: function(key) { return "custom getter still"; }
 		});
 	xio.post.custom1("tehkey", "val"); // asynchronously posts to URL http://host_server/customurl/tehkey
-	xio.get.custom1("tehkey").success(function(v) { alert(v); } ); // alerts "custom getter still"
+	xio.get.custom1("tehkey", function(v) { alert(v); } ); // alerts "custom getter still"
 
 	// oh by the way,
 	for (var p in custom1) {

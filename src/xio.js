@@ -515,13 +515,8 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         function wrapfollowfn(ev, fn) {
             var xc = ev;
             ev = function () {
-                /*var result = */ xc.apply(this, arguments);
-                var args = arguments;
-                /*if (result !== undefined) {
-                    args = $.makeArray(arguments);
-                    args.push(result);
-                }
-                return */ fn.apply(this, args);
+                xc.apply(this, arguments);
+                fn.apply(this, arguments);
             }
             return ev;
         }

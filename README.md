@@ -333,9 +333,9 @@ In the event an HTTP response from an XHR response is cached, the items are inva
 
 #### global xhr success, error, and complete events
 
-    xio.xhrSuccess(function() { alert("some AJAX call just worked!"); });
-    xio.xhrError(function() { alert("some AJAX call just failed!"); });
-    xio.xhrComplete(function() { alert("some AJAX call just completed (success or not)!"); });
+    xio.xhrSuccess(function(event, xhr, ajaxOptions) { alert("some AJAX call just worked!"); });
+    xio.xhrError(function(event, xhr, ajaxSettings, thrownError) { alert("some AJAX call just failed!"); });
+    xio.xhrComplete(function(event, XMLHttpRequest, ajaxOptions) { alert("some AJAX call just completed (success or not)!"); });
 
 #### custom implementation and redefinition
 

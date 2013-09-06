@@ -929,7 +929,7 @@ describe("xio", function() {
                 }, "xio.xhrComplete subscription failed", 250);
             });
 
-            it("should precede error", function () {
+            it("should precede complete", function () {
                 var i = 0;
                 var n = 0;
                 xio.xhrError(function () {

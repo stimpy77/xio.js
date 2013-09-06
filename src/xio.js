@@ -1,6 +1,6 @@
 // xio.js
 // http://github.com/stimpy77/xio.js
-// version 0.1.1
+// version 0.1.2
 // send feedback to jon@jondavis.net
 
 var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
@@ -10,7 +10,7 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         if (!$) throw "jQuery must be referenced before xio.js is loaded.";
 
         var configuration = {
-            clientCacheInvalidationLocation: 'session'
+            cacheInvalidateTrackingStore: 'session'
         };
 
         function formatKey(key) {
@@ -460,7 +460,7 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             invalidatedItemsHeader = invalidatedItemsHeader.split(';');
 
             // get invalidation flags from session storage  
-            var invalidatedItems = getDefinitions[configuration.clientCacheInvalidationLocation]("invalidated-http-cache-items")();
+            var invalidatedItems = getDefinitions[configuration.cacheInvalidateTrackingStore]("invalidated-http-cache-items")();
             invalidatedItems = invalidatedItems ? invalidatedItems : {};
 
             // update invalidation flags data set  
@@ -469,12 +469,12 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             }
 
             // store revised invalidation flags data set back into session storage  
-            setDefinitions[configuration.clientCacheInvalidationLocation]("invalidated-http-cache-items", stringify(invalidatedItems));
+            setDefinitions[configuration.cacheInvalidateTrackingStore]("invalidated-http-cache-items", stringify(invalidatedItems));
         }
 
         function cachebust(url) {
             // get invalidation flags from session storage  
-            var invalidatedItems = getDefinitions[configuration.clientCacheInvalidationLocation]("invalidated-http-cache-items")();
+            var invalidatedItems = getDefinitions[configuration.cacheInvalidateTrackingStore]("invalidated-http-cache-items")();
             invalidatedItems = invalidatedItems ? invalidatedItems : {};
 
             // if item match, return concatonated URL  

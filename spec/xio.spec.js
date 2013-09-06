@@ -469,6 +469,33 @@ describe("xio", function() {
                     }, "Unhandled xhr error occurred, check console", 500)
                 });
             });
+            describe("2nd param as fn", function () {
+                it("should execute as success", function () {
+                    var v = xio.verbs;
+                    xio.define("resources2fnparam", {
+                        url: "spec/res/{0}",
+                        methods: [v.get],
+                        dataType: 'json'
+                    });
+                    var result;
+                    var state;
+                    xio.get.resources2fnparam("get.json", function (v) {
+                        result = v;
+                        state = "success";
+                    }).error(function (e) {
+                        expect("error").toBeFalsy(" ~ by the way, you need to make sure to add .json file extension to IIS / IIS Express's mime types");
+                        state = "error";
+                    }).complete(function () {
+                        expect(result).not.toBeFalsy();
+                        expect(result.first).not.toBeFalsy();
+                        expect(result.last).not.toBeFalsy();
+                    });
+                    var t = this;
+                    waitsFor(function () {
+                        return state !== undefined;
+                    }, "Unhandled xhr error occurred, check console", 500)
+                });
+            });
 
             describe("404", function () {
 

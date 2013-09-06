@@ -209,7 +209,7 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             }
         }
 
-        function synchronousPromiseResult(promise) { // bit of a hack to make synchronous operations appear asynchronous
+        function synchronousPromiseResult(promise, successfn, errorfn) { // bit of a hack to make synchronous operations appear asynchronous
             promise = promise || {};
             var ret;
             var autocall = function (callback) { callback.call(this); return ret; }; // execute and return my psuedo-promise; also, this?
@@ -247,6 +247,8 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             ret.done = wrapcall(promise.done) || autocall;
             ret.always = wrapcall(promise.always) || autocall;
             ret.complete = ret.always;
+            if (successfn) ret.success(successfn);
+            if (errorfn) ret.error(errorfn);
             return ret;
         }
 
@@ -533,9 +535,46 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             xhrComplete = wrapfollowfn(xhrComplete, fn);
         }
 
+        function cascadeargs() {
+            var ret = {};
+            //argsarray => kvp {arg, array => value, "types"}
+            var skip = 0;
+            for (var a in arguments) {
+                var def = arguments[a];
+                var name, curs;
+                for (var n in arguments[a]) {
+                    if (def.hasOwnProperty(n)) name = n;
+                }
+                for (var n in arguments[a-skip]) {
+                    if (arguments[a-skip].hasOwnProperty(n)) curs = n;
+                }
+                var value = arguments[a-skip][curs][0];
+                if (def === undefined || def === null) continue;
+                var types = def[name][1].split('|');
+                var matchtype = false;
+                for (var t in types) {
+                    if ($.type(value) == types[t]) {
+                        matchtype = true;
+                    }
+                }
+                if (matchtype) {
+                    ret[name] = value;
+                }
+                else skip++;
+            }
+            return ret;
+        }
+
         function createRoutedHandler(verb, options) {
 
-            return function (key, data) {
+            return function (key, data, successfn, errorfn) {
+
+                var args = cascadeargs(
+                    { key: [key, "string|number|array"] },
+                    { data: [data, "string|number|object"] },
+                    { successfn: [successfn, "function"] },
+                    { errorfn: [errorfn, "function"] });
+                key = args.key, data = args.data, successfn = args.successfn, errorfn = args.errorfn;
 
                 options = options || {};
                 var url = options.url;
@@ -565,9 +604,12 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
                 if (options.async === false) {
                     // return immediately
                     var response = ajax(url, jqoptions);
-                    return synchronousPromiseResult(response);
+                    return synchronousPromiseResult(response, successfn, errorfn);
                 }
-                return ajax(url, jqoptions);
+                var ret = ajax(url, jqoptions);
+                if (successfn) ret.success(successfn);
+                if (errorfn) ret.error(errorfn);
+                return ret;
             };
         }
         return {

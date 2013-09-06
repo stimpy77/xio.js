@@ -77,7 +77,7 @@ The primary reason was to be able to isolate the repository from the operation, 
 							  // to integrate with the server
 	xio.post[repository](key, value).complete(function() {
 
-	    xio.get[repository](key).success(function(val) {
+	    xio.get[repository](key, function(val) {
 		    console.log(val);
 		});
 
@@ -130,8 +130,17 @@ See `xio.verbs`:
     var val;
     xio.get.local("my_key").success(function(v) 
         val = v;
-    });
+    }).error(function(e) { alert('error'); });
 
+	// or
+
+    xio.get.local("my_key", function(v) 
+        val = v; // success
+    }, function(e) {
+		alert('error');
+	});
+
+	// also, local patch
     xio.set.local("my_key", {
         first: "Bob",
         last: "Jones"

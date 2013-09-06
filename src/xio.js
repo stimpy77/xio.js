@@ -432,16 +432,19 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             };
         }
 
-        var ajaxinit;
+        //var ajaxinit;
         function ajax(url, jqoptions) {
-            if (!ajaxinit) {
+            /*if (!ajaxinit) {
                 $(document).ajaxError(raise_xhrError);
                 $(document).ajaxSuccess(raise_xhrSuccess);
                 $(document).ajaxComplete(raise_xhrComplete);
                 ajaxinit = true;
-            }
+            }*/
             url = cachebust(url); // see cache-busting section below
-            return $.ajax(url, jqoptions);
+            return $.ajax(url, jqoptions)
+                .success(raise_xhrSuccess)
+                .error(raise_xhrError)
+                .complete(raise_xhrComplete);
         }
 
 
@@ -490,27 +493,27 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         /// end cache-busting
         /////////////////////
 
-        function raise_xhrError(event, xhr, settings) {
-            xhrError(event, xhr, settings);
+        function raise_xhrError(xhr, textStatus, errorThrown) {
+            xhrError("error", xhr, textStatus, errorThrown);
         }
 
-        function xhrError(event, xhr, settings) {
+        function xhrError(eventinfo, xhr, textStatus, errorThrown) {
 
         }
 
-        function raise_xhrSuccess(event, xhr, settings) {
-            xhrSuccess(event, xhr, settings);
+        function raise_xhrSuccess(data, textStatus, xhr) {
+            xhrSuccess("success", data, textStatus, xhr);
         }
 
-        function xhrSuccess(event, xhr, settings) {
+        function xhrSuccess(eventinfo, data, textStatus, xhr) {
             handleInvalidationFlags(xhr);
         }
 
-        function raise_xhrComplete(event, xhr, settings) {
-            xhrComplete(event, xhr, settings);
+        function raise_xhrComplete(xhr, textStatus) {
+            xhrComplete("complete", xhr, textStatus);
         }
 
-        function xhrComplete(event, xhr, settings) {
+        function xhrComplete(eventinfo, xhr, textStatus) {
 
         }
 

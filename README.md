@@ -243,11 +243,12 @@ In this example, the `get()` and `post()` operations are explicitly declared int
                     dataType: 'json'
                 });
     var val;
-    xio.get.specresource("myResourceAction" /* can also put success and error callbacks as final params */ ).success(function(v) { // gets http://host_server/spec/res/myResourceAction
-        val = v;
-    }).complete(function() {
-        // continue processing with populated val
-    });
+    xio.get.specresource("myResourceAction" /* can also put success and error callbacks as final params */ )
+	    .success(function(v) { // gets http://host_server/spec/res/myResourceAction
+            val = v;
+        }).complete(function() {
+            // continue processing with populated val
+        });
 
 #### web server resource (synchronous GET)
 

@@ -512,29 +512,30 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
 
         }
 
+        function wrapfollowfn(ev, fn) {
+            var xc = ev;
+            ev = function () {
+                /*var result = */ xc.apply(this, arguments);
+                var args = arguments;
+                /*if (result !== undefined) {
+                    args = $.makeArray(arguments);
+                    args.push(result);
+                }
+                return */ fn.apply(this, args);
+            }
+            return ev;
+        }
 
         function subscribe_xhrerror(fn) { // nesting 
-            var xc = xhrError;
-            xhrError = function () {
-                xc.apply(this, arguments);
-                fn.apply(this, arguments);
-            }
+            xhrError = wrapfollowfn(xhrError, fn);
         }
 
         function subscribe_xhrsuccess(fn) { // nesting 
-            var xc = xhrSuccess;
-            xhrSuccess = function () {
-                xc.apply(this, arguments);
-                fn.apply(this, arguments);
-            }
+            xhrSuccess = wrapfollowfn(xhrSuccess, fn);
         }
 
         function subscribe_xhrcomplete(fn) { // nesting 
-            var xc = xhrComplete;
-            xhrComplete = function () {
-                xc.apply(this, arguments);
-                fn.apply(this, arguments);
-            }
+            xhrComplete = wrapfollowfn(xhrComplete, fn);
         }
 
         function createRoutedHandler(verb, options) {

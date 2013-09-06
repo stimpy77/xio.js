@@ -1,6 +1,6 @@
 XIO (xio.js)
 ======
-version 0.1.1 initial prototype (all 39-or-so tests pass)
+version 0.1.1 initial prototype (all 45-or-so spec tests pass)
 
 A consistent data repository strategy for local and remote resources.
 
@@ -313,6 +313,16 @@ In this example, the `get()` and `post()` operations are explicitly declared int
         }
         xio.patch.contactsvc(id, myModification).success(function() {  /* .. */ }).error(function() { /* .. */ });
     });
+
+#### client-side HTTP cache invalidation
+
+In the event an HTTP response from an XHR response is cached, the items are invalidated if any XIO XHR response includes the header X-Invalidate-Cache-Item with the item's URL as the header value. For more information, see http://www.jondavis.net/techblog/post/2013/08/10/A-Consistent-Approach-To-Client-Side-Cache-Invalidation.aspx
+
+#### global xhr success, error, and complete events
+
+    xio.xhrSuccess(function() { alert("some AJAX call just worked!"); });
+    xio.xhrError(function() { alert("some AJAX call just failed!"); });
+    xio.xhrComplete(function() { alert("some AJAX call just completed (success or not)!"); });
 
 #### custom implementation and redefinition
 

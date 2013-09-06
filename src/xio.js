@@ -9,6 +9,10 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
     globals.Xio = function () {
         if (!$) throw "jQuery must be referenced before xio.js is loaded.";
 
+        var configuration = {
+            clientCacheInvalidationLocation: 'session'
+        };
+
         function formatKey(key) {
             if ($.type(key) == "array") {
                 key = $.makeArray(key);
@@ -120,7 +124,6 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
                 return synchronousPromiseResult({ error: function (callback) { callback.call(this, "Not found"); } });  // this?
             }
         }
-
 
         // cookie
         function cookieSetDefinition(key, value, expires, path, domain) {
@@ -427,6 +430,113 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             };
         }
 
+        var ajaxinit;
+        function ajax(url, jqoptions) {
+            if (!ajaxinit) {
+                $(document).ajaxError(raise_xhrError);
+                $(document).ajaxSuccess(raise_xhrSuccess);
+                $(document).ajaxComplete(raise_xhrComplete);
+                ajaxinit = true;
+            }
+            url = cachebust(url); // see cache-busting section below
+            return $.ajax(url, jqoptions);
+        }
+
+
+        /////////////////////
+        /// cache-busting
+        // info: http://www.jondavis.net/techblog/post/2013/08/10/A-Consistent-Approach-To-Client-Side-Cache-Invalidation.aspx
+
+        // since we may be using IIS/ASP.NET which ignores case on the path, we need a function to force lower-case on the path  
+        function prepurl(u) {
+            return u.split('?')[0].toLowerCase() + (u.indexOf("?") > -1 ? "?" + u.split('?')[1] : "");
+        }
+
+        function handleInvalidationFlags(xhr) {
+
+            // capture HTTP header  
+            var invalidatedItemsHeader = xhr.getResponseHeader("X-Invalidate-Cache-Item");
+            if (!invalidatedItemsHeader) return;
+            invalidatedItemsHeader = invalidatedItemsHeader.split(';');
+
+            // get invalidation flags from session storage  
+            var invalidatedItems = getDefinitions[configuration.clientCacheInvalidationLocation]("invalidated-http-cache-items")();
+            invalidatedItems = invalidatedItems ? invalidatedItems : {};
+
+            // update invalidation flags data set  
+            for (var i in invalidatedItemsHeader) {
+                invalidatedItems[prepurl(invalidatedItemsHeader[i])] = Date.now();
+            }
+
+            // store revised invalidation flags data set back into session storage  
+            setDefinitions[configuration.clientCacheInvalidationLocation]("invalidated-http-cache-items", stringify(invalidatedItems));
+        }
+
+        function cachebust(url) {
+            // get invalidation flags from session storage  
+            var invalidatedItems = getDefinitions[configuration.clientCacheInvalidationLocation]("invalidated-http-cache-items")();
+            invalidatedItems = invalidatedItems ? invalidatedItems : {};
+
+            // if item match, return concatonated URL  
+            var invalidated = invalidatedItems[prepurl(url)];
+            if (invalidated) {
+                return url + (url.indexOf("?") > -1 ? "&" : "?") + "_=" + invalidated;
+            }
+            // no match; return unmodified  
+            return url;
+        }
+        /// end cache-busting
+        /////////////////////
+
+        function raise_xhrError(event, xhr, settings) {
+            xhrError(event, xhr, settings);
+        }
+
+        function xhrError(event, xhr, settings) {
+
+        }
+
+        function raise_xhrSuccess(event, xhr, settings) {
+            xhrSuccess(event, xhr, settings);
+        }
+
+        function xhrSuccess(event, xhr, settings) {
+            handleInvalidationFlags(xhr);
+        }
+
+        function raise_xhrComplete(event, xhr, settings) {
+            xhrComplete(event, xhr, settings);
+        }
+
+        function xhrComplete(event, xhr, settings) {
+
+        }
+
+
+        function subscribe_xhrerror(fn) { // nesting 
+            var xc = xhrError;
+            xhrError = function () {
+                xc.apply(this, arguments);
+                fn.apply(this, arguments);
+            }
+        }
+
+        function subscribe_xhrsuccess(fn) { // nesting 
+            var xc = xhrSuccess;
+            xhrSuccess = function () {
+                xc.apply(this, arguments);
+                fn.apply(this, arguments);
+            }
+        }
+
+        function subscribe_xhrcomplete(fn) { // nesting 
+            var xc = xhrComplete;
+            xhrComplete = function () {
+                xc.apply(this, arguments);
+                fn.apply(this, arguments);
+            }
+        }
+
         function createRoutedHandler(verb, options) {
 
             return function (key, data) {
@@ -458,13 +568,15 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
                 jqoptions.data = data;
                 if (options.async === false) {
                     // return immediately
-                    var response = $.ajax(url, jqoptions);
+                    var response = ajax(url, jqoptions);
                     return synchronousPromiseResult(response);
                 }
-                return $.ajax(url, jqoptions);
+                return ajax(url, jqoptions);
             };
         }
         return {
+
+            config: configuration,
 
             // action implementations
             "get": getDefinitions,
@@ -481,7 +593,12 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             "formatString": formatString,
 
             // reference
-            "verbs": verbs
+            "verbs": verbs,
+
+            // events
+            "xhrError": subscribe_xhrerror,
+            "xhrSuccess": subscribe_xhrsuccess,
+            "xhrComplete": subscribe_xhrcomplete
         };
     };
 

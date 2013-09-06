@@ -35,6 +35,14 @@ namespace xio.js
                 });
 
             routes.MapHttpRoute(
+                "cache invalidate",
+                "spec/svr/{controller}/Invalidate",
+                new
+                {
+                    action = "Invalidate"
+                });
+
+            routes.MapHttpRoute(
                 "API Default",
                 "spec/svr/{controller}/{key}",
                 new

@@ -541,6 +541,39 @@ describe("xio", function() {
                     });
                 });
             });
+
+            
+            describe("cached", function () {
+
+                it("should stay cached, and invalidate with X-Invalidate-Cache-Item", function () {
+                    var state;
+                    xio.define("cachedSample", {
+                        url: "/spec/svr/CachedSample/{0}",
+                        methods: [xio.verbs.get, xio.verbs.post],
+
+                    });
+                    xio.get.cachedSample("").success(function (result1) {
+                        xio.get.cachedSample("").success(function (result2) {
+                            expect(result2).toBe(result1);
+                            xio.post.cachedSample("Invalidate").complete(function () {
+                                xio.get.cachedSample("").success(function (result3) {
+                                    expect(result3).not.toBe(result1);
+                                    state = "complete1";
+                                });
+                            }).error(function () {
+                                debugger;
+                                expect("error").toBeFalsy();
+                            });
+                        });
+                    });
+
+                    waitsFor(function () {
+                        return state !== undefined;
+                    }, "unknown failure (timeout)", 600);
+                });
+
+            });
+
         });
 
         describe("xio.post.xhr", function () {
@@ -803,6 +836,118 @@ describe("xio", function() {
                 waitsFor(function () {
                     return state !== undefined;
                 }, "unknown failure (timeout)", 700);
+            });
+        });
+
+        describe("xio.xhrSuccess", function () {
+            it("should capture success", function () {
+                var succeeded1;
+                var succeeded2;
+                xio.xhrSuccess(function () {
+                    succeeded1 = true;
+                });
+                xio.xhrSuccess(function () {
+                    succeeded2 = true;
+                });
+                xio.define("resources4success", {
+                    url: "spec/res/{0}",
+                    methods: [xio.verbs.get],
+                    dataType: 'json'
+                });
+                xio.get.resources4success("get.json");
+
+                waitsFor(function () {
+                    return succeeded1 && succeeded2;
+                }, "xio.xhrSuccess subscription failed", 250);
+            });
+        });
+
+
+        describe("xio.xhrComplete", function () {
+            it("should capture complete", function () {
+                var succeeded1;
+                var succeeded2;
+                xio.xhrComplete(function () {
+                    succeeded1 = true;
+                });
+                xio.xhrComplete(function () {
+                    succeeded2 = true;
+                });
+                xio.define("resources4complete", {
+                    url: "spec/res/{0}",
+                    methods: [xio.verbs.get],
+                    dataType: 'json'
+                });
+                xio.get.resources4complete("get.json");
+
+                waitsFor(function () {
+                    return succeeded1 && succeeded2;
+                }, "xio.xhrComplete subscription failed", 250);
+            });
+
+            it("should follow success", function () {
+                var i = 0;
+                var n = 0;
+                xio.xhrSuccess(function () {
+                    i = 1;
+                });
+                xio.xhrComplete(function () {
+                    n = i * 2;
+                });
+                xio.define("resources4successcomplete", {
+                    url: "spec/res/{0}",
+                    methods: [xio.verbs.get],
+                    dataType: 'json'
+                });
+                xio.get.resources4successcomplete("get.json");
+
+                waitsFor(function () {
+                    return i == 1 && n == 2;
+                }, "xio.xhrComplete did not follow success", 250);
+            });
+        });
+
+        describe("xio.xhrError", function () {
+            it("should capture error", function () {
+                var succeeded1;
+                var succeeded2;
+                xio.xhrError(function () {
+                    succeeded1 = true;
+                });
+                xio.xhrError(function () {
+                    succeeded2 = true;
+                });
+                xio.define("resources4error", {
+                    url: "spec/res/{0}",
+                    methods: [xio.verbs.get],
+                    dataType: 'json'
+                });
+                xio.get.resources4complete("gimme404erroragain");
+
+                waitsFor(function () {
+                    return succeeded1 && succeeded2;
+                }, "xio.xhrComplete subscription failed", 250);
+            });
+
+            it("should precede error", function () {
+                var i = 0;
+                var n = 0;
+                xio.xhrError(function () {
+                    i = 1;
+                });
+                xio.xhrComplete(function () {
+                    n = i * 2;
+                });
+                xio.define("resources4errorcomplete", {
+                    url: "spec/res/{0}",
+                    methods: [xio.verbs.get],
+                    dataType: 'json'
+                });
+                xio.get.resources4successcomplete("gimme404erroragain");
+
+                waitsFor(function () {
+                    return i == 1 && n == 2;
+                }, "xio.xhrComplete did not follow success", 250);
             });
         });
     });

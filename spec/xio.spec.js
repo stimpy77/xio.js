@@ -576,7 +576,7 @@ describe("xio", function() {
                     var state;
                     xio.define("cachedSample", {
                         url: "/spec/svr/CachedSample/{0}",
-                        methods: [xio.verbs.get, xio.verbs.post],
+                        methods: [xio.verbs.get, xio.verbs.post]
 
                     });
                     xio.get.cachedSample("").success(function (result1) {

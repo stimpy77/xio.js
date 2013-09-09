@@ -418,7 +418,7 @@ In the event an HTTP response from an XHR response is cached, the items are inva
 
 #### web worker (asynchronous function)
 
-    var workerpromise = xio.worker(function() { /* do something crazy slow */ });
+    var workerpromise = xio.worker(function() { /* do something crazy slow */ return 42; });
     workerpromise.success(function (v) { result = v; });
 	workerpromise.error(function(e) { alert("error occurred in background task: " + e); } );
     workerpromise.start();

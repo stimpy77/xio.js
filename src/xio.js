@@ -666,12 +666,13 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
                     if (wrkr) wrkr.postMessage(m || "start");
                 }
                 ret.start = ret;
-                ret.onmessage = function (cb) {receivefn.push(cb); return ret; };
+                ret.message = function (cb) {receivefn.push(cb); return ret; };
                 ret.success = function (cb) { successfn.push(cb); return ret; };
                 ret.error = function (cb) { errorfn.push(cb); return ret; };
                 ret.fail = ret.error;
                 ret.complete = function (cb) { completefn.push(cb); return ret; };
                 ret.done = ret.complete;
+                ret.post = function (data) { wrkr.postMessage(data); };
 
                 var errhandled = false;
                 ret.send = function (data) {

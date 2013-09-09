@@ -390,8 +390,8 @@ In the event an HTTP response from an XHR response is cached, the items are inva
         console.log("second subscription (" + (arg1 + arg2) + ")");
 	});
     xio.event("myevent", 3, 4); // logs "first subscription (3), second subscription (7)"
-                                // explanation: to raise the event, don't pass a function type as the second param, 
-                                // and the params will propagate
+                                // explanation: to raise the event, don't pass a function type as the 
+                                // second param, and the params will propagate
 
 ## Future intentions
 

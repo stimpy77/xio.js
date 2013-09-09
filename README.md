@@ -463,7 +463,11 @@ Additionally, in a completely isolated parallel path, if no progress is made by 
 
 ### Service Bus, Queuing, and background tasks support
  
-At an extremely lightweight scale, I do want to implement some service bus and queue features. For remote service integration, this would just be more verbs to sit on top of the existing CRUD operations, as well as WebSockets / long polling / SignalR integration. This is all fairly vague right now because I am not sure yet what it will look like. On a local level, however, I am considering integrating with [Web Workers](https://developer.mozilla.org/en-US/docs/Web/Guide/Performance/Using_web_workers). It might be nice to use XIO to manage deferred I/O via the Web Workers feature. There are major limitations to Web Workers, however, such as no access to the DOM, so I am not sure yet.
+At an extremely lightweight scale, I do want to implement some service bus and queue features. For remote service integration, this would just be more verbs to sit on top of the existing CRUD operations, as well as WebSockets / long polling / SignalR integration. This is all fairly vague right now because I am not sure yet what it will look like. 
+
+~~On a local level, however, I am considering integrating with [Web Workers](https://developer.mozilla.org/en-US/docs/Web/Guide/Performance/Using_web_workers). It might be nice to use XIO to manage deferred I/O via the Web Workers feature. There are major limitations to Web Workers, however, such as no access to the DOM, so I am not sure yet.~~
+
+I have added Web Workers, and for this feature the next need is to wrap "postMessage" messaging with the super fast [Transferable Objects](https://www.google.com/search?q=%22web+worker%22+transferable+objects) specification. This would require a change in how web worker code sends data back, but as long as postMessage remains supported that should be fine.
 
 ## Other notes
 

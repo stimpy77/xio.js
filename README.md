@@ -422,7 +422,7 @@ In the event an HTTP response from an XHR response is cached, the items are inva
     var myworkerwrapper = xio.worker(function() { /* do something crazy slow */ return 42; });
     myworkerwrapper.success(function (v) { result = v; });
 	myworkerwrapper.error(function(e) { alert("error occurred in background task: " + e); } );
-	myworkerwrapper.message(function(m) { console.log(m); } );
+	myworkerwrapper.message(function(m) { console.log("Message from worker: " + m); } );
     myworkerwrapper.start();
 
     // send a message to the worker

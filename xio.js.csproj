@@ -88,7 +88,9 @@
     <Content Include="lib\jquery-2.0.3.min.js" />
     <Content Include="license.txt" />
     <Content Include="SpecRunner.html" />
+    <Content Include="spec\workerthing.js" />
     <Content Include="spec\xio.spec.js" />
+    <Content Include="src\xio-iex.js" />
     <Content Include="src\xio.js" />
     <Content Include="Web.config" />
   </ItemGroup>

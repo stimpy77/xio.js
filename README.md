@@ -1,6 +1,6 @@
 XIO (xio.js)
 ======
-version 0.1.2 (all 49-or-so spec tests pass)
+version 0.1.3 (all 51-or-so spec tests pass)
 
 A consistent data repository strategy for local and remote resources.
 
@@ -29,6 +29,26 @@ It also supports generating XHR functions and providing implementations that loo
 
     mywebservice.post("mykey", "myvalue");
     var value = mywebservice.get("mykey")(); // assumes synchronous; see below
+
+#### BONUS
+
+XIO also supports:
+
+- custom actions 
+
+    xio.mycustomaction.mytargethandler(..)
+
+- custom events 
+
+    xio.event("myevent", function() { .. }); // subscribe
+    xio.event("myevent", 3, 9); // raise
+
+- asynchronous web worker promises
+
+    xio.worker(function() { /* something that's super slow*/ })
+        .success(function(result) { console.log(result); })
+        .start();
+
 
 ### Optionally synchronous (asynchronous by default)
 
@@ -392,6 +412,38 @@ In the event an HTTP response from an XHR response is cached, the items are inva
     xio.event("myevent", 3, 4); // logs "first subscription (3), second subscription (7)"
                                 // explanation: to raise the event, don't pass a function type as the 
                                 // second param, and the params will propagate
+
+#### web worker (asynchronous function)
+
+    var workerpromise = xio.worker(function() { /* do something crazy slow */ });
+    workerpromise.success(function (v) { result = v; });
+	workerpromise.error(function(e) { alert("error occurred in background task: " + e); } );
+    workerpromise.start();
+
+The web workers feature in XIO serializes the function passed in; you cannot use closures. The function passed in is wrapped with basic flow control to support starting with .start() and to package the response to the promise.
+
+To be true to the W3C's intended nature of web workers, you can alternatively pass as the .worker(..) parameter an HTTP file path to a web worker script, or pass an actual Worker object. 
+
+    var workerpromise = xio.worker('scripts/myscript.js');
+    workerpromise.success(function (v) { result = v; });
+	workerpromise.error(function(e) { alert("error occurred in background task: " + e); } );
+    workerpromise.start();
+
+In order for this to work, you must structure your script as follows: 
+
+    // to start:
+    var start = function() { /* your script starts here */ };
+	self.onmessage = function (d) {
+		if (d.data == "start") start();
+	}
+
+    // to send up a success to the promise:
+    postMessage({ result: "success", data: 42 }); // where 42 here is your success payload
+
+    // to manually send up an error to the promise:
+    postMessage({ result: "error", error: "an error occurred, dude"});
+
+These messages will cause termination of the worker.
 
 ## Future intentions
 

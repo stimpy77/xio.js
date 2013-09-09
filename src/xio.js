@@ -10,7 +10,8 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         if (!$) throw "jQuery must be referenced before xio.js is loaded.";
 
         var configuration = {
-            cacheInvalidateTrackingStore: 'session'
+            cacheInvalidateTrackingStore: 'session',
+            parentDirectory: "src/"
         };
 
         function formatKey(key) {
@@ -394,7 +395,8 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
                     if (handlers) {
                         if (handlers[name]) throw "A " + actionVerb + " route or action handler named \"" + name + "\" already exists. Use redefine().";
                         retset[verbmember] = handlers[name] = createCustomHandler(actionVerb, custom[v], options);
-                        if (!_module[verbmember] && actions[verbmember]) {
+
+                        if (!_module[verbmember] && actions[verbmember]) { // todo: what the heck? directly accessing the output obj!? possible design flaw (but I'm still really not sure I want to return the actions obj)
                             _module[verbmember] = actions[verbmember];
                         }
                     }
@@ -462,14 +464,7 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             };
         }
 
-        //var ajaxinit;
         function ajax(url, jqoptions) {
-            /*if (!ajaxinit) {
-                $(document).ajaxError(raise_xhrError);
-                $(document).ajaxSuccess(raise_xhrSuccess);
-                $(document).ajaxComplete(raise_xhrComplete);
-                ajaxinit = true;
-            }*/
             url = cachebust(url); // see cache-busting section below
             return $.ajax(url, jqoptions)
                 .success(raise_xhrSuccess)
@@ -530,14 +525,10 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         var xhrcomplete_fn = [];
         var custom_fn = {};
 
-        function raise(fnarray, evname, args___) {
-            if (arguments.length > 3) {
+        function raise(fnarray, args___) {
+            if (arguments.length > 2) {
                 args___ = $.makeArray(arguments);
                 args___.shift(); // drop fnarray from args
-            }
-            else {
-                args___ = $.makeArray(args___);
-                if (evname) args___.unshift(evname);
             }
             for (var i = 0; i < fnarray.length; i++) {
                 fnarray[i].apply(this, args___); // this?
@@ -545,21 +536,19 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         }
 
         function raise_xhrSuccess(data, textStatus, xhr) {
-            raise(xhrsuccess_fn, "success", /* arguments */ data, textStatus, xhr);
+            raise(xhrsuccess_fn, "success", data, textStatus, xhr);
         }
 
         function raise_xhrError(xhr, textStatus, errorThrown) {
-            raise(xhrerror_fn, "error", arguments);
+            raise(xhrerror_fn, "error", xhr, textStatus, errorThrown);
         }
 
         function raise_xhrComplete(xhr, textStatus) {
-            raise(xhrcomplete_fn, "complete", arguments);
+            raise(xhrcomplete_fn, "complete", xhr, textStatus);
         }
 
-        function raise_custom(name, args___) {
-            args___ = $.makeArray(arguments);
-            args___.shift(); // drop name
-            return raise(custom_fn[name], name, args___);
+        function raise_customfn(name, args___) {
+            return raise.call(this, custom_fn[name], arguments);
         }
 
         function subscribe_xhrsuccess(fn) {
@@ -580,7 +569,7 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         function subscribe_custom(name, fn) {
             if (!name) throw "Must specify name.";
             var fnarr = custom_fn[name] || (custom_fn[name] = []);
-            if (!fn || typeof (fn) != "function") return raise_custom.apply(this, arguments);
+            if (!fn || typeof (fn) != "function") return raise_customfn.apply(this, arguments);
             fnarr.push(fn);
         }
 
@@ -661,6 +650,128 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
                 return ret;
             };
         }
+
+        function worker(fn, receivefn, successfn, errorfn, completefn) {
+            if (typeof (fn) == "string") {
+                var wkobj = new Worker(fn);
+                return worker(wkobj);
+            }
+            receivefn = receivefn || [];
+            successfn = successfn || [];
+            errorfn = errorfn || [];
+            completefn = completefn || [];
+            if (typeof (fn) == "object" && fn.constructor == Worker) {
+                var wrkr = fn;
+                var ret = function (m) {
+                    if (wrkr) wrkr.postMessage(m || "start");
+                }
+                ret.start = ret;
+                ret.onmessage = function (cb) {receivefn.push(cb); return ret; };
+                ret.success = function (cb) { successfn.push(cb); return ret; };
+                ret.error = function (cb) { errorfn.push(cb); return ret; };
+                ret.fail = ret.error;
+                ret.complete = function (cb) { completefn.push(cb); return ret; };
+                ret.done = ret.complete;
+
+                var errhandled = false;
+                ret.send = function (data) {
+                    wrkr.postMessage(data);
+                };
+                ret.postMessage = ret.send;
+                ret.terminate = function () {
+                    return wrkr.terminate();
+                }
+                wrkr.onmessage = function (ev) {
+                    var data = ev.data;
+                    raise(receivefn, arguments);
+                    if (data) {
+                        if (data["console.log"]) {
+                            console.log(data["console.log"]);
+                        }
+                        if (data.result) {
+                            switch (data.result) {
+                                case "console.log":
+                                    console.log()
+                                    break;
+                                case "success":
+                                    raise(successfn, data.data, wrkr);
+                                    raise(completefn, wrkr);
+                                    break;
+                                case "error":
+                                    errhandled = true;
+                                    raise(errorfn, data.data, wrkr);
+                                    raise(completefn, data.data, wrkr);
+                                    wrkr.terminate();
+                                    break;
+                            }
+                        }
+                    }
+                }
+                wrkr.onerror = function (error) {
+                    if (!errhandled) {
+                        wrkr.onmessage({ result: "error", error: error });
+                    }
+                };
+                ret.worker = wrkr;
+                return ret;
+            }
+            if (typeof (fn) == "function") {
+                var throwOnError = true; 
+                var userpayload = fn.toString();
+                var startfn = function () {
+                    try {
+                        if (__xiodebug) {
+                            console.log("starting");
+                        }
+                        var result = "fn";
+                        emit({ result: "success", data: result });
+                        self.close();
+                    } catch (e) {
+                        emit({ result: "error", error: e });
+                        throw e;
+                    }
+                };
+                var onmessage = function (d) {
+                    var m = d.data;
+                    if (m === "start") {
+                        start.apply(this, arguments);
+                    }
+                };
+                var workerbody = "self.onmessage = " + onmessage.toString() + "\n"
+                    + "var __xiodebug = " + Xio.debug + ";"
+                    + "var emit = function() { postMessage.apply(this, arguments) };"
+                    + "var console = { log: function (msg) { emit({ \"console.log\": msg }); } };\n"
+                    + "var start=" + startfn.toString().replace(/\"fn\"/, userpayload + ".call(this, arguments);");
+                var blob;
+                try {
+                    blob = new Blob([workerbody], { type: "text/javascript" });
+                } catch (e) { // Backwards-compatibility
+                    try {
+                        window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+                        blob = new BlobBuilder();
+                        blob.append(workerbody);
+                        blob = blob.getBlob();
+                    } catch (error) {
+                        debugger;
+                        throw error;
+                    }
+                }
+                var wrkr;
+
+               
+                try {
+                    wrkr = new Worker(URL.createObjectURL(blob));
+                } catch (err) {
+                    var dir = configuration.parentDirectory;
+                    wrkr = new Worker(dir + "xio-iex.js");
+                    wrkr.postMessage({ userpayload: fn.toString() });
+                }
+                return worker(wrkr, receivefn, successfn, errorfn, completefn);
+            }
+            throw "not implemented (xio.worker): " + typeof (fn);
+        }
+        
+
         var _module = {
 
             config: configuration,
@@ -686,7 +797,10 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             "xhrError": subscribe_xhrerror,
             "xhrSuccess": subscribe_xhrsuccess,
             "xhrComplete": subscribe_xhrcomplete,
-            "event": subscribe_custom
+            "event": subscribe_custom,
+
+            // web worker
+            "worker": worker
         };
         return _module;
     };

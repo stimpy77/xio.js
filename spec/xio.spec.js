@@ -6,6 +6,7 @@ describe("xio", function() {
 
     describe("xiospec", function() {
         it("should init", function () {
+            Xio.debug = true;
             (window || exports).xio = (window || exports).xio || Xio();
             expect(this).toBeDefined();
             $.ajax("spec/svr/KeyValueStore?method=clear", {
@@ -1007,7 +1008,7 @@ describe("xio", function() {
         });
     });
 
-    describe("xio.[customaction]", function() {
+    describe("xio.[customaction]", function () {
         it("should allow custom verbs to be declared with promise results", function () {
             var handler = xio.define("myCustomActionHandler", {
                 actions: ["myCustomAction", "myFailingAction"],
@@ -1060,17 +1061,48 @@ describe("xio", function() {
             expect(handler.myFailingAction).toBe(xio.myFailingAction.myCustomActionHandler2);
             var successResult, failResult;
             handler.myCustomAction().success(function (v) {
-                successResult = v=="success2";
+                successResult = v == "success2";
             }).error(function () {
                 successResult = false;
             });
             handler.myFailingAction().success(function () {
                 failResult = false;
             }).error(function (e) {
-                failResult = e.toString()=="failure2";
+                failResult = e.toString() == "failure2";
             });
             expect(successResult).toBe(true);
             expect(failResult).toBe(true);
         });
-    })
+    });
+    
+    describe("xio.worker", function () {
+        it("should take a web worker and kick it off, returning a promise", function () {
+            var result;
+            var threeSecondBlock = function () {
+                function block1second() {
+                    var x = Date.now().valueOf();
+                    while (Date.now().valueOf() - x < 500) { }
+                }
+                for (var i = 0; i < 1; i++) {
+                    block1second();
+                }
+                return 500;
+            };
+            var workerpromise = xio.worker(threeSecondBlock);
+            workerpromise.success(function (v) { result = v; });
+            workerpromise.start();
+            waitsFor(function () { return result == 500; }, 1000);
+        });
+
+        it("should take a script reference and kick return a promise", function () {
+            var refpromise = xio.worker("spec/workerthing.js");
+            var result;
+            refpromise.success(function (v) {
+                result = v;
+                expect(v).toBe(42);
+            });
+            refpromise.start();
+            waitsFor(function () { return result == 42; }, 1000);
+        });
+    });
 });

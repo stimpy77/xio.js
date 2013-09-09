@@ -436,7 +436,7 @@ In the event an HTTP response from an XHR response is cached, the items are inva
 
 The web workers feature in XIO serializes the function passed in; you cannot use closures. All of the limitations of HTML 5 Web Workers apply. You cannot access DOM elements. The function passed in is serialized to a string and is wrapped with basic flow control to support starting with .start() and to package the response to the promise.
 
-To use inline web workers as demonstrated here from within Internet Explorer (any version, including v11) you will need to ensure that the file **xio-iex.js** is available on the server and that `xio.config.parentDirectory` points to the containing directory relative to the page's base path.
+To use inline web workers as demonstrated here from within Internet Explorer (any version, including v11) you will need to ensure that the file **xio-iexww.js** is available on the server and that `xio.config.parentDirectory` points to the containing directory relative to the page's base path.
 
 To be true to the W3C's intended nature of web workers, you can alternatively pass as the .worker(..) parameter an HTTP file path to a web worker script, or pass an actual Worker object. 
 

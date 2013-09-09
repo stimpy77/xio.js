@@ -361,6 +361,26 @@ In the event an HTTP response from an XHR response is cached, the items are inva
 		}
 	}
 
+    // now let's add a custom action, a whole new "verb" to stack promise handlers onto
+    xio.define("myCustomActionHandler", {
+        actions: ["customaction1"],  // declare a new action (not HTTP method)
+        customaction1: function() {
+            return "foobar myCustomActionHandler";
+        }
+    });
+    xio.define("myOtherHandler", {
+        actions: ["customaction1"],
+        customaction1: function() {
+            return "whizbang myOtherHandler";
+        }
+    });
+    xio.customaction1.myCustomActionHandler().success(function(result) {
+        console.log(result); // outputs "foobar myCustomActionHandler"
+	});
+    xio.customaction1.myOtherHandler().success(function(result) {
+        console.log(result); // outputs "whizbang myOtherHandler"
+	});
+
 #### basic custom events
 
     xio.event("myevent", function(e, arg1, arg2) {

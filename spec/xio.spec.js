@@ -1006,4 +1006,71 @@ describe("xio", function() {
             xio.event("myevent", 3, 4); // logs "first subscription (3), second subscription (7)"
         });
     });
+
+    describe("xio.[customaction]", function() {
+        it("should allow custom verbs to be declared with promise results", function () {
+            var handler = xio.define("myCustomActionHandler", {
+                actions: ["myCustomAction", "myFailingAction"],
+                "myCustomAction": function () {
+                    return "success";
+                },
+                "myFailingAction": function () {
+                    throw "failure";
+                }
+            });
+            expect(handler).not.toBeFalsy();
+            expect(handler.myCustomAction).toBe(xio.myCustomAction.myCustomActionHandler);
+            expect(handler.myFailingAction).toBe(xio.myFailingAction.myCustomActionHandler);
+            var successResult, failResult;
+            handler.myCustomAction().success(function () {
+                successResult = true;
+            }).error(function () {
+                successResult = false;
+            });
+            handler.myFailingAction().success(function () {
+                failResult = false;
+            }).error(function () {
+                failResult = true;
+            });
+            expect(successResult).toBe(true);
+            expect(failResult).toBe(true);
+        });
+
+        it("should allow custom verbs to be redefined with promise results", function () {
+            var handler = xio.define("myCustomActionHandler2", {
+                actions: ["myCustomAction", "myFailingAction"],
+                "myCustomAction": function () {
+                    return "success";
+                },
+                "myFailingAction": function () {
+                    throw "failure";
+                }
+            });
+            handler = xio.redefine("myCustomActionHandler2", {
+                actions: ["myCustomAction", "myFailingAction"],
+                "myCustomAction": function () {
+                    return "success2";
+                },
+                "myFailingAction": function () {
+                    throw "failure2";
+                }
+            });
+            expect(handler).not.toBeFalsy();
+            expect(handler.myCustomAction).toBe(xio.myCustomAction.myCustomActionHandler2);
+            expect(handler.myFailingAction).toBe(xio.myFailingAction.myCustomActionHandler2);
+            var successResult, failResult;
+            handler.myCustomAction().success(function (v) {
+                successResult = v=="success2";
+            }).error(function () {
+                successResult = false;
+            });
+            handler.myFailingAction().success(function () {
+                failResult = false;
+            }).error(function (e) {
+                failResult = e.toString()=="failure2";
+            });
+            expect(successResult).toBe(true);
+            expect(failResult).toBe(true);
+        });
+    })
 });

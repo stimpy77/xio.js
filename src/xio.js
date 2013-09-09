@@ -313,6 +313,8 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             // etc etc
         };
 
+        var actions = {};
+
         function isPromise(o) { // a bit of a hack? is this what constitutes a promise?
             if (typeof (o) !== "object") return false;
             if (!o.success || typeof (o.success) !== "function") return false;
@@ -346,12 +348,20 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
 
         var define = function (name, options) {
             var custom = {}, customqty;
-            for (var v in verbs) {
-                if (options[v] !== undefined && typeof (options[v]) == "function") {
-                    custom[v] = options[v];
-                    customqty++;
+            var getcustomitems = function (contr, matches) {
+                for (var i in matches) {
+                    var v = $.type(matches) == "array" ? matches[i] : i;
+                    if (options[v] !== undefined && typeof (options[v]) == "function") {
+                        contr[v] = options[v];
+                        customqty++;
+                    }
                 }
+                return contr;
             }
+            getcustomitems(custom, verbs);
+            getcustomitems(custom, actions);
+            getcustomitems(custom, options.actions);
+
             if (!options.methods) {
                 options.methods = customqty == 0 ? ["GET"] : [];
             }
@@ -362,19 +372,31 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
                 var verbmember = actionVerb.toLowerCase();
                 var handlers = verbs[verbmember] ? verbHandles[verbmember] : null;
                 if (handlers) {
-                    if (handlers[name]) throw "A " + actionVerb + " route named \"" + name + "\" already exists.";
+                    if (handlers[name]) throw "A " + actionVerb + " route named \"" + name + "\" already exists. Use redefine().";
                     retset[verbmember] = handlers[name] = createRoutedHandler(actionVerb, options);
                 }
+            }
+            // add custom actions
+            for (var index in options.actions) {
+                var actionVerb = options.actions[index];
+                var handlers = actions[actionVerb] ? actions[actionVerb] : actions[actionVerb] = {};
             }
             // add custom implementations
             for (var v in custom) {
                 if (custom.hasOwnProperty(v)) {
-                    var actionVerb = verbs[v];
+                    var actionVerb = verbs[v] || actions[v] ? v : undefined;
                     var verbmember = v;
-                    var handlers = verbs[verbmember] ? verbHandles[verbmember] : null;
+                    var handlers = verbs[verbmember]
+                        ? verbHandles[verbmember]
+                        : actions[verbmember]
+                            ? actions[verbmember]
+                            : null;
                     if (handlers) {
-                        if (handlers[name]) throw "A " + actionVerb + " route named \"" + name + "\" already exists.";
+                        if (handlers[name]) throw "A " + actionVerb + " route or action handler named \"" + name + "\" already exists. Use redefine().";
                         retset[verbmember] = handlers[name] = createCustomHandler(actionVerb, custom[v], options);
+                        if (!_module[verbmember] && actions[verbmember]) {
+                            _module[verbmember] = actions[verbmember];
+                        }
                     }
                 }
             }
@@ -383,14 +405,22 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         };
 
         function redefine(definition_name, /* optional */ verb, implementation, options) {
-            if (typeof (verb) !== "string") {
-                options = implementation;
-                implementation = verb;
-                verb = undefined;
+            var args = cascadeargs(
+                { definition_name: [definition_name, "string"] },
+                { verb: [verb, "string|array"] },
+                { implementation: [implementation, "function|object"] },
+                { options: [options, "object"] });
+            definition_name = args.definition_name, verb = args.verb, implementation = args.implementation, options = args.options;
 
+            if (!verb) {
                 for (var v in verbs) {
                     if (verbHandles[v] && verbHandles[v][definition_name]) {
                         delete verbHandles[v][definition_name];
+                    }
+                }
+                for (var v in actions) {
+                    if (actions[v] && actions[v][definition_name]) {
+                        delete actions[v][definition_name];
                     }
                 }
                 return define(definition_name, implementation || options);
@@ -631,7 +661,7 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
                 return ret;
             };
         }
-        return {
+        var _module = {
 
             config: configuration,
 
@@ -658,6 +688,7 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             "xhrComplete": subscribe_xhrcomplete,
             "event": subscribe_custom
         };
+        return _module;
     };
 
 }).apply(this, __xiodependencies);

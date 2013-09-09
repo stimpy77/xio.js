@@ -995,6 +995,15 @@ describe("xio", function() {
 
             expect(result).toBe(3);
             expect(result2).toBe(6);
+
+            // readme
+            xio.event("myevent", function (e, arg1, arg2) {
+                console.log("first subscription (" + arg1 + ")");
+            });
+            xio.event("myevent", function (e, arg1, arg2) {
+                console.log("second subscription (" + (arg1 + arg2) + ")");
+            });
+            xio.event("myevent", 3, 4); // logs "first subscription (3), second subscription (7)"
         });
     });
 });

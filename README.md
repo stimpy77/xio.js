@@ -52,6 +52,8 @@ XIO also supports:
 
     `    .start();`
 
+These are just some quick samples. You will need to scroll down to review the documentation for these features and more. The Wiki will be set up after XIO's continued accumulation of features drastically slows down.
+
 
 ### Optionally synchronous (asynchronous by default)
 

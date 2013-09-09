@@ -44,11 +44,19 @@ XIO also supports:
 
 - asynchronous web worker promises
 
-    `xio.worker(function() { /* something that's super slow runs in an OS thread */ return "hello world"; })`
+Web worker promises example:
 
-    `    .success(function(result) { console.log(result); })`
+    xio.worker("mybackgroundtask.js")
+        .success(function(result) { console.log(result); })
+        .start();
 
-    `    .start();`
+	// or even inline
+    xio.worker(function() { 
+			/* something that's super slow runs in an OS thread */ 
+			return "hello world";
+		})
+        .success(function(result) { console.log(result); })
+        .start();
 
 These are just some quick samples. You will need to scroll down to review the documentation for these features and more. The Wiki will be set up after XIO's continued accumulation of features drastically slows down.
 

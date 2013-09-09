@@ -588,7 +588,7 @@ describe("xio", function() {
                                     state = "complete1";
                                 });
                             }).error(function () {
-                                debugger;
+                                //debugger;
                                 expect("error").toBeFalsy();
                             });
                         });
@@ -978,5 +978,8 @@ describe("xio", function() {
             });
         });
     });
+    
+    ////////////////////////////////////////////////////////////////////////
+   
 
 });

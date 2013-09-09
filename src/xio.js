@@ -493,49 +493,46 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         /// end cache-busting
         /////////////////////
 
-        function raise_xhrError(xhr, textStatus, errorThrown) {
-            xhrError("error", xhr, textStatus, errorThrown);
-        }
-
-        function xhrError(eventinfo, xhr, textStatus, errorThrown) {
-
-        }
+        var xhrsuccess_fn = [function (eventinfo, data, textStatus, xhr) {
+            handleInvalidationFlags(xhr);
+        }];
+        var xhrerror_fn = [];
+        var xhrcomplete_fn = [];
 
         function raise_xhrSuccess(data, textStatus, xhr) {
-            xhrSuccess("success", data, textStatus, xhr);
+            var args = $.makeArray(arguments);
+            args.unshift("success");
+            for (var i = 0; i < xhrsuccess_fn.length; i++) {
+                xhrsuccess_fn[i].apply(this, args);
+            }
         }
 
-        function xhrSuccess(eventinfo, data, textStatus, xhr) {
-            handleInvalidationFlags(xhr);
+        function raise_xhrError(xhr, textStatus, errorThrown) {
+            var args = $.makeArray(arguments);
+            args.unshift("error");
+            for (var i = 0; i < xhrerror_fn.length; i++) {
+                xhrerror_fn[i].apply(this, args);
+            }
         }
 
         function raise_xhrComplete(xhr, textStatus) {
-            xhrComplete("complete", xhr, textStatus);
-        }
-
-        function xhrComplete(eventinfo, xhr, textStatus) {
-
-        }
-
-        function wrapfollowfn(ev, fn) {
-            var xc = ev;
-            ev = function () {
-                xc.apply(this, arguments);
-                fn.apply(this, arguments);
+            var args = $.makeArray(arguments);
+            args.unshift("complete");
+            for (var i = 0; i < xhrcomplete_fn.length; i++) {
+                xhrcomplete_fn[i].apply(this, args);
             }
-            return ev;
         }
 
-        function subscribe_xhrerror(fn) { // nesting 
-            xhrError = wrapfollowfn(xhrError, fn);
+        function subscribe_xhrsuccess(fn) { 
+            xhrsuccess_fn.push(fn);
         }
 
-        function subscribe_xhrsuccess(fn) { // nesting 
-            xhrSuccess = wrapfollowfn(xhrSuccess, fn);
+        function subscribe_xhrerror(fn) { 
+            xhrerror_fn.push(fn);
         }
 
-        function subscribe_xhrcomplete(fn) { // nesting 
-            xhrComplete = wrapfollowfn(xhrComplete, fn);
+        function subscribe_xhrcomplete(fn) { 
+            xhrcomplete_fn.push(fn);
         }
 
         function cascadeargs() {

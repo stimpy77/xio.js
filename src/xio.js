@@ -499,39 +499,44 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         var xhrerror_fn = [];
         var xhrcomplete_fn = [];
 
-        function raise_xhrSuccess(data, textStatus, xhr) {
-            var args = $.makeArray(arguments);
-            args.unshift("success");
-            for (var i = 0; i < xhrsuccess_fn.length; i++) {
-                xhrsuccess_fn[i].apply(this, args);
+        function raise(fnarray, evname, args) {
+            if (arguments.length > 3) {
+                args = $.makeArray(arguments);
+                args.shift(); // drop fnarray from args
             }
+            else {
+                args = $.makeArray(args);
+                if (evname) args.unshift(evname);
+            }
+            for (var i = 0; i < fnarray.length; i++) {
+                fnarray[i].apply(this, args);
+            }
+        }
+
+        function raise_xhrSuccess(data, textStatus, xhr) {
+            raise(xhrsuccess_fn, "success", /* arguments */ data, textStatus, xhr);
         }
 
         function raise_xhrError(xhr, textStatus, errorThrown) {
-            var args = $.makeArray(arguments);
-            args.unshift("error");
-            for (var i = 0; i < xhrerror_fn.length; i++) {
-                xhrerror_fn[i].apply(this, args);
-            }
+            raise(xhrerror_fn, "error", arguments);
         }
 
         function raise_xhrComplete(xhr, textStatus) {
-            var args = $.makeArray(arguments);
-            args.unshift("complete");
-            for (var i = 0; i < xhrcomplete_fn.length; i++) {
-                xhrcomplete_fn[i].apply(this, args);
-            }
+            raise(xhrcomplete_fn, "complete", arguments);
         }
 
-        function subscribe_xhrsuccess(fn) { 
+        function subscribe_xhrsuccess(fn) {
+            if (!fn || typeof(fn) != "function") return raise_xhrSuccess(arguments);
             xhrsuccess_fn.push(fn);
         }
 
         function subscribe_xhrerror(fn) { 
+            if (!fn || typeof (fn) != "function") return raise_xhrError(arguments);
             xhrerror_fn.push(fn);
         }
 
         function subscribe_xhrcomplete(fn) { 
+            if (!fn || typeof (fn) != "function") return raise_xhrComplete(arguments);
             xhrcomplete_fn.push(fn);
         }
 

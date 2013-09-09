@@ -764,7 +764,7 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
                     wrkr = new Worker(URL.createObjectURL(blob));
                 } catch (err) {
                     var dir = configuration.parentDirectory;
-                    wrkr = new Worker(dir + "xio-iex.js");
+                    wrkr = new Worker(dir + "xio-iexww.js");
                     wrkr.postMessage({ userpayload: fn.toString() });
                 }
                 return worker(wrkr, receivefn, successfn, errorfn, completefn);

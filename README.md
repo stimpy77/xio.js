@@ -30,8 +30,6 @@ It also supports generating XHR functions and providing implementations that loo
     mywebservice.post("mykey", "myvalue");
     var value = mywebservice.get("mykey")(); // assumes synchronous; see below
 
-#### BONUS
-
 XIO also supports:
 
 - custom actions 

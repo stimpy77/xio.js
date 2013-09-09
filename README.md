@@ -1,6 +1,6 @@
 XIO (xio.js)
 ======
-version 0.1.2 initial prototype (all 46-or-so spec tests pass)
+version 0.1.2 initial prototype (all 47-or-so spec tests pass)
 
 A consistent data repository strategy for local and remote resources.
 

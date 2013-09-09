@@ -422,10 +422,10 @@ In the event an HTTP response from an XHR response is cached, the items are inva
     var workerpromise = xio.worker(function() { /* do something crazy slow */ return 42; });
     workerpromise.success(function (v) { result = v; });
 	workerpromise.error(function(e) { alert("error occurred in background task: " + e); } );
+	workerpromise.message(function(m) { console.log(m); } );
     workerpromise.start();
 
-    // we can also fuss with the Worker object itself,
-    // to do things like event listening (which promises don't offer)
+    // we can also fuss with the Worker object itself
 	var actualWebWorker = workerpromise.worker;
     actualWebWorker.addEventListener('message', function(e) {
 	  console.log('Worker said: ', e.data);

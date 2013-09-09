@@ -419,14 +419,17 @@ In the event an HTTP response from an XHR response is cached, the items are inva
 
 #### web worker (asynchronous function)
 
-    var workerpromise = xio.worker(function() { /* do something crazy slow */ return 42; });
-    workerpromise.success(function (v) { result = v; });
-	workerpromise.error(function(e) { alert("error occurred in background task: " + e); } );
-	workerpromise.message(function(m) { console.log(m); } );
-    workerpromise.start();
+    var myworkerwrapper = xio.worker(function() { /* do something crazy slow */ return 42; });
+    myworkerwrapper.success(function (v) { result = v; });
+	myworkerwrapper.error(function(e) { alert("error occurred in background task: " + e); } );
+	myworkerwrapper.message(function(m) { console.log(m); } );
+    myworkerwrapper.start();
+
+    // send a message to the worker
+    myworkerwrapper.post("Hi.");
 
     // we can also fuss with the Worker object itself
-	var actualWebWorker = workerpromise.worker;
+	var actualWebWorker = myworkerwrapper.worker;
     actualWebWorker.addEventListener('message', function(e) {
 	  console.log('Worker said: ', e.data);
 	}, false);

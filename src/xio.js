@@ -530,17 +530,17 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         var xhrcomplete_fn = [];
         var custom_fn = {};
 
-        function raise(fnarray, evname, args) {
+        function raise(fnarray, evname, args___) {
             if (arguments.length > 3) {
-                args = $.makeArray(arguments);
-                args.shift(); // drop fnarray from args
+                args___ = $.makeArray(arguments);
+                args___.shift(); // drop fnarray from args
             }
             else {
-                args = $.makeArray(args);
-                if (evname) args.unshift(evname);
+                args___ = $.makeArray(args___);
+                if (evname) args___.unshift(evname);
             }
             for (var i = 0; i < fnarray.length; i++) {
-                fnarray[i].apply(this, args); // this?
+                fnarray[i].apply(this, args___); // this?
             }
         }
 
@@ -556,10 +556,10 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             raise(xhrcomplete_fn, "complete", arguments);
         }
 
-        function raise_custom(name, args) {
-            args = $.makeArray(arguments);
-            args.shift(); // drop name
-            return raise(custom_fn[name], name, args);
+        function raise_custom(name, args___) {
+            args___ = $.makeArray(arguments);
+            args___.shift(); // drop name
+            return raise(custom_fn[name], name, args___);
         }
 
         function subscribe_xhrsuccess(fn) {

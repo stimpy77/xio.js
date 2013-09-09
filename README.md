@@ -36,18 +36,21 @@ XIO also supports:
 
 - custom actions 
 
-    xio.mycustomaction.mytargethandler(..)
+    `xio.mycustomaction.mytargethandler(..)`
 
 - custom events 
 
-    xio.event("myevent", function() { .. }); // subscribe
-    xio.event("myevent", 3, 9); // raise
+    `xio.event("myevent", function() { .. }); // subscribe`
+
+    `xio.event("myevent", 3, 9); // raise`
 
 - asynchronous web worker promises
 
-    xio.worker(function() { /* something that's super slow*/ })
-        .success(function(result) { console.log(result); })
-        .start();
+    `xio.worker(function() { /* something that's super slow runs in an OS thread */ })`
+
+    `    .success(function(result) { console.log(result); })`
+
+    `    .start();`
 
 
 ### Optionally synchronous (asynchronous by default)

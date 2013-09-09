@@ -361,6 +361,16 @@ In the event an HTTP response from an XHR response is cached, the items are inva
 		}
 	}
 
+#### basic custom events
+
+    xio.event("myevent", function(e, arg1) {
+        console.log("first subscription (" + arg1 + "));
+	});
+    xio.event("myevent", function(e, arg1) {
+        console.log("second subscription (" + arg1 + "));
+	});
+    xio.event("myevent", 3); // logs "first subscription (3), second subscription (3)"
+
 ## Future intentions
 
 

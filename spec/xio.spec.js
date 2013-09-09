@@ -981,5 +981,20 @@ describe("xio", function() {
     
     ////////////////////////////////////////////////////////////////////////
    
+    describe("xio.event", function () {
+        it("should subscribe and execute", function () {
+            var result=0;
+            var result2;
+            xio.event("hello", function (e, v) {
+                result = v;
+            });
+            xio.event("hello", function (e, v) {
+                result2 = v+result;
+            });
+            xio.event("hello", 3);
 
+            expect(result).toBe(3);
+            expect(result2).toBe(6);
+        });
+    });
 });

@@ -498,6 +498,7 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         }];
         var xhrerror_fn = [];
         var xhrcomplete_fn = [];
+        var custom_fn = {};
 
         function raise(fnarray, evname, args) {
             if (arguments.length > 3) {
@@ -509,7 +510,7 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
                 if (evname) args.unshift(evname);
             }
             for (var i = 0; i < fnarray.length; i++) {
-                fnarray[i].apply(this, args);
+                fnarray[i].apply(this, args); // this?
             }
         }
 
@@ -525,19 +526,32 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             raise(xhrcomplete_fn, "complete", arguments);
         }
 
+        function raise_custom(name, args) {
+            args = $.makeArray(arguments);
+            args.shift(); // drop name
+            return raise(custom_fn[name], name, args);
+        }
+
         function subscribe_xhrsuccess(fn) {
-            if (!fn || typeof(fn) != "function") return raise_xhrSuccess(arguments);
+            if (!fn || typeof(fn) != "function") return raise_xhrSuccess.apply(this, arguments); // this?
             xhrsuccess_fn.push(fn);
         }
 
         function subscribe_xhrerror(fn) { 
-            if (!fn || typeof (fn) != "function") return raise_xhrError(arguments);
+            if (!fn || typeof (fn) != "function") return raise_xhrError.apply(this, arguments); // this?
             xhrerror_fn.push(fn);
         }
 
         function subscribe_xhrcomplete(fn) { 
-            if (!fn || typeof (fn) != "function") return raise_xhrComplete(arguments);
+            if (!fn || typeof (fn) != "function") return raise_xhrComplete.apply(this, arguments); // this? 
             xhrcomplete_fn.push(fn);
+        }
+
+        function subscribe_custom(name, fn) {
+            if (!name) throw "Must specify name.";
+            var fnarr = custom_fn[name] || (custom_fn[name] = []);
+            if (!fn || typeof (fn) != "function") return raise_custom.apply(this, arguments);
+            fnarr.push(fn);
         }
 
         function cascadeargs() {
@@ -641,7 +655,8 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             // events
             "xhrError": subscribe_xhrerror,
             "xhrSuccess": subscribe_xhrsuccess,
-            "xhrComplete": subscribe_xhrcomplete
+            "xhrComplete": subscribe_xhrcomplete,
+            "event": subscribe_custom
         };
     };
 

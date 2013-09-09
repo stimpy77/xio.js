@@ -1104,5 +1104,15 @@ describe("xio", function() {
             refpromise.start();
             waitsFor(function () { return result == 42; }, 1000);
         });
+        it("should report errors", function () {
+            var result;
+            var dothrow = function () {
+                throw "intended error";
+            };
+            var workerpromise = xio.worker(dothrow);
+            workerpromise.error(function (e) { result = "error"; })
+            workerpromise.start();
+            waitsFor(function () { return result == "error"; }, 1000);
+        });
     });
 });

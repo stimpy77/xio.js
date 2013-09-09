@@ -424,6 +424,13 @@ In the event an HTTP response from an XHR response is cached, the items are inva
 	workerpromise.error(function(e) { alert("error occurred in background task: " + e); } );
     workerpromise.start();
 
+    // we can also fuss with the Worker object itself,
+    // to do things like event listening (which promises don't offer)
+	var actualWebWorker = workerpromise.worker;
+    actualWebWorker.addEventListener('message', function(e) {
+	  console.log('Worker said: ', e.data);
+	}, false);
+
 The web workers feature in XIO serializes the function passed in; you cannot use closures. The function passed in is wrapped with basic flow control to support starting with .start() and to package the response to the promise.
 
 To use inline web workers as demonstrated here from within Internet Explorer (any version, including v11) you will need to ensure that the file **xio-iex.js** is available on the server and that `xio.config.parentDirectory` points to the containing directory relative to the page's base path.

@@ -43,7 +43,7 @@ The key can be a number, or an array of strings or numbers. It will be reformatt
     var person = xio.get.local([2,4])();
 
     xio.post.mywebservice([2,4], { first: "Bob", last: "Blork" }); 
-        // when defined, formatted as URL perhaps "/myservice/2/4"
+        // when defined, formatted as URL perhaps "/myservice/2/4" or "/myservice.php?x=2&y=4"
     var person = xio.get.mywebservice([2,4])(); // assumes synchronous; see below
 
 In all cases, you can also use asynchronous invocation.

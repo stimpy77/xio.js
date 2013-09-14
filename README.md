@@ -314,18 +314,18 @@ Sample 2:
 	   // ..
 	});
 
-In this example, the `get()` and `post()` operations are explicitly declared into the defined verb handler and wrapped with a promise, rather than internally wrapped into XHR/AJAX calls. If an explicit definition returns a promise (i.e. an object with `.success` and `.complete`), the returned promise will not be wrapped. You can mix-and-match both generated XHR calls (with the `url` and `methods` properties) as well as custom implementations (with explicit `get`/`post`/etc properties) in the options argument. Custom implementations will override any generated implementations if they conflict.
+In this example, the `get()` and `post()` operations are explicitly declared into the defined verb handler and wrapped with a promise, rather than internally wrapped into XHR/AJAX calls. If an explicit definition returns a promise (i.e. an object with `.success` and `.complete`), the returned promise will not be wrapped. 
 
-You can mix and match.
+You can mix-and-match both generated XHR calls (with the `url` and `methods` properties) as well as custom implementations (with explicit `get`/`post`/etc properties) in the options argument. Custom implementations will override any generated implementations if they conflict.
 
 Sample 3:
 
 	var ops3 = xio.define("basic_sample3", {
-                    methods: [xio.verbs.get, xio.verbs.post],
+                    methods: [xio.verbs.get],
                     post: function(key,value) { return "ok"; }
                 });
 
-In this example, the `post()` operation is explicitly declared into the defined verb handler and wrapped with a promise, replacing the internally wrapped XHR/AJAX call. The `get()` operation meanwhile remains as the internally implemented XHR call.
+In this example, the `post()` operation is explicitly declared into the defined verb handler and wrapped with a promise, rather than an internally wrapped XHR/AJAX call. The `get()` operation meanwhile remains as the internally implemented XHR call.
 
 
 #### web server resource (asynchronous GET)

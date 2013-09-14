@@ -2,7 +2,7 @@ XIO (xio.js)
 ======
 version 0.1.4 (all 63-or-so spec tests pass)
 
-A consistent data repository strategy for local and remote resources.
+A consistent data repository strategy for local and remote resources, events, and web workers.
 
 ## What it does
 

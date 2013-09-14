@@ -226,6 +226,16 @@ See `xio.verbs`:
     xio.set.session("my_key", "my_value");
     var val = xio.get.session("my_key")();
     xio.delete.session("my_key");
+
+Same as `xio[verb].local`, but applied to sessionStorage. Also,
+
+    xio.patch.session
+
+and 
+
+    xio[verb].session().success().error().complete()
+
+are also implemented in the same way.
 	
 #### cookie
 
@@ -249,6 +259,18 @@ As another alternative, retaining only the `xio.set["cookie"](key, value)`, you 
         .domain("mysite.com");
 
 Note that using this approach, while more expressive and potentially more convertible to other CRUD targets, also results in each helper function deleting the previous value to set the value with the new adjustment.
+
+`xio[verb].cookie` is the same as `xio[verb].local`, but applied to cookies. Also,
+
+    xio.patch.cookie
+
+and 
+
+    xio[verb].cookie().success().error().complete()
+
+are also implemented in the same way.
+	
+
   
 ##### session cookie
 

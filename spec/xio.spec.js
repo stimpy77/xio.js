@@ -358,6 +358,9 @@ describe("xio", function() {
                     expect(v).not.toBeFalsy();
                     expect(v.last).toBe("Joe");
                     expect(v.first).toBe("Billy");
+                }).complete(function(v) {
+                    // cleanup
+                    document.cookie = encodeURIComponent(key) + "=-;path=/;expires=" + (new Date("Jan 1, 1970")).toUTCString();
                 });
             });
         });
@@ -437,6 +440,42 @@ describe("xio", function() {
             expect(definition2.put).not.toBe(def1_put);
             definition2.put("a", "b");
             expect(executed).toBe(true);
+        });
+        it("should handle options passed to own implementation at invoke time", function () {
+            var getcalled, getOptions, postcalled, postOptions, putcalled, putOptions, deletecalled, deleteOptions;
+            var def = xio.define("customruntimeoptions", {
+                "get": function (key, options) { getcalled = key == "a"; getOptions = options; },
+                "post": function (key, value, options) { postcalled = key == "b" && value == "c"; postOptions = options; },
+                "put": function (key, value, options) { putcalled = key == "d" && value == "e"; putOptions = options; },
+                "delete": function (key, options) { deletecalled = key == "f"; deleteOptions = options; }
+            });
+            def.get("a", { verb: "get" });
+            expect(getcalled).not.toBeFalsy();
+            expect(getOptions).not.toBeFalsy();
+            expect(getOptions.verb).toBe("get");
+            def.post("b", "c", { verb: "post" });
+            expect(postcalled).not.toBeFalsy();
+            expect(postOptions).not.toBeFalsy();
+            expect(postOptions.verb).toBe("post");
+            def.put("d", "e", { verb: "put" });
+            expect(putcalled).not.toBeFalsy();
+            expect(putOptions).not.toBeFalsy();
+            expect(putOptions.verb).toBe("put");
+            def["delete"]("f", { verb: "delete" });
+            expect(deletecalled).not.toBeFalsy();
+            expect(deleteOptions).not.toBeFalsy();
+            expect(deleteOptions.verb).toBe("delete");
+        });
+        it("should handle options passed to own implementation at invoke time", function () {
+            var customcalled, customOptions;
+            var def = xio.define("customruntimeoptions_customverb", {
+                "customverbs" : [ "mycustom" ],
+                "mycustom": function (key, value, options) { customcalled = key == "a" && value == "b", customOptions = options; }
+            });
+            def.mycustom("a", "b", { x: "zz" });
+            expect(customcalled).not.toBeFalsy();
+            expect(customOptions).not.toBeFalsy();
+            expect(customOptions.x).toBe("zz");
         });
     });
 
@@ -1008,10 +1047,10 @@ describe("xio", function() {
         });
     });
 
-    describe("xio.[customaction]", function () {
+    describe("xio.[customverb]", function () {
         it("should allow custom verbs to be declared with promise results", function () {
             var handler = xio.define("myCustomActionHandler", {
-                actions: ["myCustomAction", "myFailingAction"],
+                customverbs: ["myCustomAction", "myFailingAction"],
                 "myCustomAction": function () {
                     return "success";
                 },
@@ -1039,7 +1078,7 @@ describe("xio", function() {
 
         it("should allow custom verbs to be redefined with promise results", function () {
             var handler = xio.define("myCustomActionHandler2", {
-                actions: ["myCustomAction", "myFailingAction"],
+                customverbs: ["myCustomAction", "myFailingAction"],
                 "myCustomAction": function () {
                     return "success";
                 },
@@ -1048,7 +1087,7 @@ describe("xio", function() {
                 }
             });
             handler = xio.redefine("myCustomActionHandler2", {
-                actions: ["myCustomAction", "myFailingAction"],
+                customverbs: ["myCustomAction", "myFailingAction"],
                 "myCustomAction": function () {
                     return "success2";
                 },
@@ -1113,6 +1152,24 @@ describe("xio", function() {
             workerpromise.error(function (e) { result = "error"; })
             workerpromise.start();
             waitsFor(function () { return result == "error"; }, 1000);
+        });
+        it("should capture messages", function () {
+            var msg, successmsg;
+            var msgr = function () {
+                postMessage("oh!");
+                return "hello!";
+            };
+            var workerpromise = xio.worker(msgr)
+                .message(function (m) { msg = m; })
+                .success(function (s) { successmsg = s; })
+                .complete(function () {
+                    expect(msg).toBe("oh!");
+                    expect(successmsg).toBe("hello!");
+                })
+                .start();
+            waitsFor(function () {
+                return msg && successmsg;
+            }, 1000);
         });
     });
 });

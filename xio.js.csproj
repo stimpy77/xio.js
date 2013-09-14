@@ -90,7 +90,7 @@
     <Content Include="SpecRunner.html" />
     <Content Include="spec\workerthing.js" />
     <Content Include="spec\xio.spec.js" />
-    <Content Include="src\xio-iex.js" />
+    <Content Include="src\xio-iexww.js" />
     <Content Include="src\xio.js" />
     <Content Include="Web.config" />
   </ItemGroup>

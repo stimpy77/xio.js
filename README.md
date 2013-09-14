@@ -1,12 +1,13 @@
 XIO (xio.js)
 ======
-version 0.1.3 (all 52-or-so spec tests pass)
+version 0.1.4 (all 55-or-so spec tests pass)
 
 A consistent data repository strategy for local and remote resources.
 
 ## What it does
 
 xio.js is a Javascript resource that supports reading and writing data to/from local data stores and remote servers using a consistent interface convention. One can write code that can be more easily migrated between storage locations and/or URIs, and repository operations are simplified into a simple set of verbs.
+
 
 To write and read to and from local storage,
     
@@ -17,45 +18,84 @@ To write and read to and from a session cookie,
 
     xio.set.cookie("mykey", "myvalue");
     var value = xio.get.cookie("mykey")();
-    
+
 To write and read to and from a web service (as optionally synchronous; see below),
 
     xio.post.mywebservice("mykey", "myvalue");
-    var value = xio.get.mywebservice("mykey")();
+    var person = xio.get.mywebservice("mykey")();
 
 See the pattern? It supports localStorage, sessionStorage, cookies, and RESTful AJAX calls, using the same interface and conventions.
 
-It also supports generating XHR functions and providing implementations that look like:
+The value can be an object literal.
+    
+    xio.set.local("mykey", { first: "Bob", last: "Blork" });
+    var person = xio.get.local(1234)();
 
+    xio.set.cookie("mykey", { first: "Bob", last: "Blork" });
+    var person = xio.get.cookie(1234)();
+
+    xio.post.mywebservice("mykey", { first: "Bob", last: "Blork" });
+    var person = xio.get.mywebservice(1234)(); // assumes synchronous; see below
+
+The key can be a number, or an array of strings or numbers. It will be reformatted to a hyphen-joined string or to a formatted URL.
+    
+    xio.set.local([2,4], { first: "Bob", last: "Blork" }); // stored with key "2-4"
+    var person = xio.get.local([2,4])();
+
+    xio.post.mywebservice([2,4], { first: "Bob", last: "Blork" }); 
+        // when defined, formatted as URL perhaps "/myservice/2/4"
+    var person = xio.get.mywebservice([2,4])(); // assumes synchronous; see below
+
+In all cases, you can also use asynchronous invocation.
+
+    xio.set.local("mykey", "myvalue");
+    var value; xio.get.local("mykey").success(function(v) { value=v; });
+    
+    xio.set.cookie("mykey", "myvalue");
+    var value; xio.get.cookie("mykey").success(function(v) { value=v; });
+    
+    xio.post.mywebservice(1234, { first: "Bob", last: "Blork" });
+    var person; xio.get.mywebservice("mykey").success(function(v) { person=v; });
+
+XIO generates its XHR functions, providing implementations that look like:
+
+    var mywebservice = xio.define("mywebservice", {
+		url: "myurl", 
+		methods: [ xio.verbs.get, xio.verbs.post },
+        async: true
+	});
     mywebservice.post("mykey", { first: "Bob", last: "Blorg" } );
-    var value = mywebservice.get("mykey")(); // assumes synchronous; see below
+    var value = mywebservice.get("mykey", { async: false /*override*/ })();
 
 XIO also supports:
 
-- custom actions 
+- custom verbs 
 
-    `xio.mycustomaction.mytargethandler(..)`
+    `xio.mycustomverb.mytargethandler_of_saidverb(..)`
 
 - custom events 
 
-    `xio.event("myevent", function() { .. }); // subscribe`
+    `xio.event("myevent", function(x,y) { .. }); // subscribe`
 
-    `xio.event("myevent", 3, 9); // raise`
+    `xio.event("myevent", 3 /*x*/, 9 /*y*/); // raise`
 
 - asynchronous web worker promises
 
 Web worker promises example:
 
     xio.worker("mybackgroundtask.js")
+        .message(function(m) { console.log(m); } )
         .success(function(result) { console.log(result); })
         .start();
 
 	// or even inline
     xio.worker(function() { 
 			/* something that's super slow runs in an OS thread */ 
+            postMessage("oh!");
 			return "hello world";
 		})
-        .success(function(result) { console.log(result); })
+        .message(function(m) { console.log(m); } ) // "oh!"
+        .success(function(result) { console.log(result); }) "hello world"
         .start();
 
 These are just some quick samples. You will need to scroll down to review the documentation for these features and more. The Wiki will be set up after XIO's continued accumulation of features drastically slows down.
@@ -65,7 +105,7 @@ These are just some quick samples. You will need to scroll down to review the do
 
 Whether you're working with localStorage or an XHR resource, each operation returns a [promise](http://martinfowler.com/bliki/JavascriptPromise.html).
 
-When the action is synchronous, such as in working with localStorage, it returns a "synchronous promise" which is essentially a function that can optionally be immediately invoked and it will wrap `.success(value)` and return the value. This also works with XHR when `async: false` is passed in with the options during setup (`define(..)`).
+When the I/O function is synchronous, such as in working with localStorage, it returns a "synchronous promise" which is essentially a function that can optionally be immediately invoked and it will wrap `.success(value)` and return the value. This also works with XHR when `async: false` is passed in with the options during setup (`define(..)`).
 
 The examples below are the same, only because XIO knows that the localStorage implementation of get is synchronous.
 
@@ -95,7 +135,7 @@ Whenever a new repository is defined using XIO, a set of supported verb and thei
 
 ### XIO's alternative convention
 
-But the built-in convention is a bit unique using `xio[action][repository](key, value)` (i.e. `xio.post.myRepository("mykey", {first: "Bob", last: "Bison"})`, which, again, returns a promise. 
+But the built-in convention is a bit unique using `xio[verb][repository](key, value)` (i.e. `xio.post.myRepository("mykey", {first: "Bob", last: "Bison"})`, which, again, returns a promise. 
 
 This syntactical convention, with the verb preceding the repository, is different from the usual convention of `_object.method(key, value)`.
 
@@ -193,7 +233,15 @@ See `xio.verbs`:
 	
 .. supports these arguments: `(key, value, expires, path, domain)`
 
-Alternatively, retaining only the `xio.set["cookie"](key, value)`, you can automatically returned helper replacer functions:
+Alternatively, you can set a cookie's extended arguments using an options argument:
+
+    xio.set.cookie(key, value, {
+        expires: _date_,
+        path: _path_,
+        domain: _domain_
+    });
+
+As another alternative, retaining only the `xio.set["cookie"](key, value)`, you can automatically returned helper replacer functions:
 
     xio.set["cookie"](skey, svalue)
         .expires(Date.now() + 30 * 24 * 60 * 60000))
@@ -223,11 +271,11 @@ Note that using this approach, while more expressive and potentially more conver
                     dataType: 'json',
 					async: false
                 });
-    var promise = xio.get.basic_sample([4,12]).success(function(result) {
+    var promise = xio.get.basic_sample([4,12], {/*invoke options*/}).success(function(result) {
 	   // ..
 	});
 	// alternatively ..
-    var promise_ = define_result.get([4,12]).success(function(result) {
+    var promise_ = define_result.get([4,12], {/*invoke options*/}).success(function(result) {
 	   // ..
 	});
 
@@ -242,10 +290,10 @@ The rest of the options are used, for now, as a jQuery's $.ajax(..., `options`) 
 In the above example, `define_result` is an object that looks like this:
 
     {
-	    get: function(key) { /* .. */ },
-	    post: function(key, value) { /* .. */ },
-	    put: function(key, value) { /* .. */ },
-	    delete: function(key) { /* .. */ }
+	    get: function(key /*, options */ ) {/* .. */},
+	    post: function(key, value /*, options */ ) { /* .. */ },
+	    put: function(key, value /*, options */ ) { /* .. */ },
+	    delete: function(key /*, options */ ) { /* .. */ }
 	}
 
 In fact,
@@ -254,9 +302,11 @@ In fact,
 
 .. should evaluate to `true`.
 
+The `{/*invoke options*/}` parameter allows you to apply overrides to the options that were declared in xio.define(..). For example, you can override the URL or toggle the async switch. Since, at the time of this README, XIO uses jQuery to perform AJAX functions, the options parameter will be passed to jQuery, so any options that are meaningful to jQuery.ajax(..) can be overridden with this parameter.
+
 Sample 2:
 
-	var ops = xio.define("basic_sample2", {
+	var ops2 = xio.define("basic_sample2", {
                     get: function(key) { return "value"; },
                     post: function(key,value) { return "ok"; }
                 });
@@ -266,6 +316,18 @@ Sample 2:
 
 In this example, the `get()` and `post()` operations are explicitly declared into the defined verb handler and wrapped with a promise, rather than internally wrapped into XHR/AJAX calls. If an explicit definition returns a promise (i.e. an object with `.success` and `.complete`), the returned promise will not be wrapped. You can mix-and-match both generated XHR calls (with the `url` and `methods` properties) as well as custom implementations (with explicit `get`/`post`/etc properties) in the options argument. Custom implementations will override any generated implementations if they conflict.
 
+You can mix and match.
+
+Sample 3:
+
+	var ops3 = xio.define("basic_sample3", {
+                    methods: [xio.verbs.get, xio.verbs.post],
+                    post: function(key,value) { return "ok"; }
+                });
+
+In this example, the `post()` operation is explicitly declared into the defined verb handler and wrapped with a promise, replacing the internally wrapped XHR/AJAX call. The `get()` operation meanwhile remains as the internally implemented XHR call.
+
+
 #### web server resource (asynchronous GET)
 
     xio.define("specresource", {
@@ -274,7 +336,7 @@ In this example, the `get()` and `post()` operations are explicitly declared int
                     dataType: 'json'
                 });
     var val;
-    xio.get.specresource("myResourceAction" /* can also put success and error callbacks as final params */ )
+    xio.get.specresource("myResourceAction" /*, options, successfn, errorfn */ )
 	    .success(function(v) { // gets http://host_server/spec/res/myResourceAction
             val = v;
         }).complete(function() {
@@ -287,11 +349,11 @@ In this example, the `get()` and `post()` operations are explicitly declared int
                     url: "spec/res/{0}",
                     methods: [xio.verbs.get],
                     dataType: 'json',
-                    async: false // <<==!!!!!
+                    async: false // <<<===!!!!!!
                 });
     var val = xio.get.synchronous_specresources("myResourceAction")(); // gets http://host_server/spec/res/myResourceAction
 
-#### web server resource POST
+#### web server resource (POST)
 
     xio.define("contactsvc", {
                     url: "svcapi/contact/{0}",
@@ -302,7 +364,7 @@ In this example, the `get()` and `post()` operations are explicitly declared int
         first: "Fred",
         last: "Flinstone"
     }
-    var val = xio.post.contactsvc(null, myModel /* can also put success and error callbacks as final params */ )
+    var val = xio.post.contactsvc(null, myModel /*, options, successfn, errorfn */ )
 	    .success(function(id) { // posts to http://host_server/svcapi/contact/
             // model has been posted, new ID returned
             // validate:
@@ -313,7 +375,7 @@ In this example, the `get()` and `post()` operations are explicitly declared int
 
 #### web server resource (DELETE)
 
-    xio.delete.myresourceContainer("myresource");
+    xio.delete.myresourceContainer("myresource" /*, options, successfn, errorfn*/); // same as GET but with DELETE as the HTTP verb
 
 #### web server resource (PUT)
 
@@ -326,7 +388,7 @@ In this example, the `get()` and `post()` operations are explicitly declared int
         first: "Fred",
         last: "Flinstone"
     }
-    var val = xio.post.contactsvc(null, myModel /* can also put success and error callbacks as final params */ )
+    var val = xio.post.contactsvc(null, myModel  /*, options, success, error */ )
 	    .success(function(id) { // posts to http://host_server/svcapi/contact/
             // model has been posted, new ID returned
             // now modify:
@@ -348,7 +410,7 @@ In this example, the `get()` and `post()` operations are explicitly declared int
         first: "Fred",
         last: "Flinstone"
     }
-    var val = xio.post.contactsvc(null, myModel /* can also put success and error callbacks as final params */ )
+    var val = xio.post.contactsvc(null, myModel  /*, options, success, error */ )
 	    .success(function(id) { // posts to http://host_server/svcapi/contact/
             // model has been posted, new ID returned
             // now modify:
@@ -358,7 +420,7 @@ In this example, the `get()` and `post()` operations are explicitly declared int
             xio.patch.contactsvc(id, myModification).success(function() {  /* .. */ }).error(function() { /* .. */ });
         });
 
-#### client-side HTTP cache invalidation
+#### web server resource -- client-side HTTP cache invalidation
 
 In the event an HTTP response from an XHR response is cached, the items are invalidated if any XIO XHR response includes the header X-Invalidate-Cache-Item with the item's URL as the header value. For more information, see http://www.jondavis.net/techblog/post/2013/08/10/A-Consistent-Approach-To-Client-Side-Cache-Invalidation.aspx
 
@@ -392,24 +454,24 @@ In the event an HTTP response from an XHR response is cached, the items are inva
 		}
 	}
 
-    // now let's add a custom action, a whole new "verb" to stack promise handlers onto
-    var myCustomActionHandler = xio.define("myCustomActionHandler", {
-        actions: ["customaction1"],  // declare a new local action 
-                                     // (not HTTP method; notice it's "actions" not "methods")
-        customaction1: function() {
-            return "foobar myCustomActionHandler";
+    // now let's add a custom verb, a whole new "verb" to stack promise handlers onto
+    var myCustomVerbHandler = xio.define("myCustomVerbHandler", {
+        customverbs: ["customverb1"],  // declare a new verb 
+                                     // (not HTTP method; notice it's "customverbs" not "methods")
+        customverb1: function() {
+            return "foobar myCustomVerbHandler";
         }
     });
     var myOtherHandler = xio.define("myOtherHandler", {
-        actions: ["customaction1"],
-        customaction1: function() {
+        customverbs: ["customverb1"],
+        customverb1: function() {
             return "whizbang myOtherHandler";
         }
     });
-    xio.customaction1.myCustomActionHandler().success(function(result) {
-        console.log(result); // outputs "foobar myCustomActionHandler"
+    xio.customverb1.myCustomVerbHandler().success(function(result) {
+        console.log(result); // outputs "foobar myCustomVerbHandler"
 	});
-    xio.customaction1.myOtherHandler().success(function(result) {
+    xio.customverb1.myOtherHandler().success(function(result) {
         console.log(result); // outputs "whizbang myOtherHandler"
 	});
 

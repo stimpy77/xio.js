@@ -27,7 +27,7 @@ See the pattern? It supports localStorage, sessionStorage, cookies, and RESTful 
 
 It also supports generating XHR functions and providing implementations that look like:
 
-    mywebservice.post("mykey", { first: "Bob", last: "Blorg" );
+    mywebservice.post("mykey", { first: "Bob", last: "Blorg" } );
     var value = mywebservice.get("mykey")(); // assumes synchronous; see below
 
 XIO also supports:

@@ -1,6 +1,6 @@
 XIO (xio.js)
 ======
-version 0.1.4 (all 55-or-so spec tests pass)
+version 0.1.4 (all 63-or-so spec tests pass)
 
 A consistent data repository strategy for local and remote resources.
 
@@ -283,6 +283,16 @@ are also implemented in the same way.
     xio.set.cookie("my_key", "my_value", new Date(Date.now() + 30 * 24 * 60 * 60000));
     var val = xio.get.cookie("my_key")();
     xio.delete.cookie("my_key");
+
+As a convenience, you can generate a date with:
+
+    var expires = xio.time.addSeconds(30); // 30 seconds from now
+    var expires = xio.time.addMinutes(10); // ten minutes from now
+    var expires = xio.time.addHours(4); // four hours from now
+    var expires = xio.time.addDays(2); // two days from now
+    var expires = xio.time.addWeeks(2); // two weeks from now
+    var expires = xio.time.addMonths(2); // two months from now
+    var expires = xio.time.addYears(2); // two years from now
 
 #### web server resource (basics)
 

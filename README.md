@@ -216,9 +216,9 @@ See `xio.verbs`:
         first: "Bob",
         last: "Jones"
     }).complete(function() {
-        xio.patch.local("my_key", {
+        var endresult = xio.patch.local("my_key", {
             last: "Jonas" // keep first name
-        });
+        })();
     });
   
 #### sessionStorage

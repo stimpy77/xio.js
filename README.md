@@ -284,7 +284,7 @@ are also implemented in the same way.
     var val = xio.get.cookie("my_key")();
     xio.delete.cookie("my_key");
 
-As a convenience, you can generate a date with:
+As a convenience, you can generate an expiration date with:
 
     var expires = xio.time.addSeconds(30); // 30 seconds from now
     var expires = xio.time.addMinutes(10); // ten minutes from now

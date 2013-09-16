@@ -86,7 +86,7 @@ Web worker promises example:
     xio.worker("mybackgroundtask.js")
         .message(function(m) { console.log(m); } )
         .success(function(result) { console.log(result); })
-        .start();
+        .start(); // << todo: remove the .start() requirement
 
 	// or even inline
     xio.worker(function() { 
@@ -536,7 +536,7 @@ In the event an HTTP response from an XHR response is cached, the items are inva
 	  console.log('Worker said: ', e.data);
 	}, false);
 
-The web workers feature in XIO serializes the function passed in; you cannot use closures. All of the limitations of HTML 5 Web Workers apply. You cannot access DOM elements. The function passed in is serialized to a string and is wrapped with basic flow control to support starting with .start() and to package the response to the promise.
+The web workers feature in XIO serializes the function passed in; you cannot use closures. All of the limitations of HTML 5 Web Workers apply. You cannot access DOM elements. The function passed in is serialized to a string and is wrapped with basic flow control to support starting with .start() and to package the response to the promise. (The .start() "feature" is a temporary requirement for invocation, but is likely to remain for the worker script itself.)
 
 To use inline web workers as demonstrated here from within Internet Explorer (any version, including v11) you will need to ensure that the file **xio-iexww.js** is available on the server and that `xio.config.parentDirectory` points to the containing directory relative to the page's base path.
 
@@ -545,7 +545,7 @@ To be true to the W3C's intended nature of web workers, you can alternatively pa
     var workerpromise = xio.worker('scripts/myscript.js');
     workerpromise.success(function (v) { result = v; });
 	workerpromise.error(function(e) { alert("error occurred in background task: " + e); } );
-    workerpromise.start();
+    workerpromise.start(); // << todo: remove the .start() requirement
 
 In order for this to work, you must structure your script as follows: 
 

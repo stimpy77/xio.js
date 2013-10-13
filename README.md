@@ -8,6 +8,9 @@ A consistent data repository strategy for local and remote resources, events, an
 
 xio.js is a Javascript resource that supports reading and writing data to/from local data stores and remote servers using a consistent interface convention. One can write code that can be more easily migrated between storage locations and/or URIs, and repository operations are simplified into a simple set of verbs.
 
+Initialize first.
+
+    var xio = Xio();
 
 To write and read to and from local storage,
     

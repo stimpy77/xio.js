@@ -36,8 +36,8 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         function localGetDefinition(key) {
             key = formatKey(key);
             var result = localStorage.getItem(key);
-            if (result && ((result.indexOf("{") == 0 && result.indexOf("}") == result.length - 1) ||
-                          (result.indexOf("[") == 0 && result.indexOf("]") == result.length - 1))) {
+            if (result && ((result.indexOf("{") == 0 && result.lastIndexOf("}") == result.length - 1) ||
+                          (result.indexOf("[") == 0 && result.lastIndexOf("]") == result.length - 1))) {
                 try {
                     result = parseJSON(result);
                 }
@@ -97,8 +97,8 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         function sessionGetDefinition(key) {
             key = formatKey(key);
             var result = sessionStorage.getItem(key);
-            if (result && ((result.indexOf("{") == 0 && result.indexOf("}") == result.length - 1) ||
-                          (result.indexOf("[") == 0 && result.indexOf("]") == result.length - 1))) {
+            if (result && ((result.indexOf("{") == 0 && result.lastIndexOf("}") == result.length - 1) ||
+                          (result.indexOf("[") == 0 && result.lastIndexOf("]") == result.length - 1))) {
                 try {
                     result = parseJSON(result);
                 }
@@ -202,8 +202,8 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             key = formatKey(key);
             // from mozilla (!!)
             var result = decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(key).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
-            if (result && ((result.indexOf("{") == 0 && result.indexOf("}") == result.length - 1) ||
-                          (result.indexOf("[") == 0 && result.indexOf("]") == result.length - 1))) {
+            if (result && ((result.indexOf("{") == 0 && result.lastIndexOf("}") == result.length - 1) ||
+                          (result.indexOf("[") == 0 && result.lastIndexOf("]") == result.length - 1))) {
                 try {
                     result = parseJSON(result);
                 }

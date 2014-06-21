@@ -820,6 +820,18 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             throw "not implemented (xio.worker): " + typeof (fn);
         }
 
+        // utility used for cookie expiration per docs
+        var time = {
+            now: Date.now,
+            addSeconds: function (s) { return new Date(Date.now() + s * 1000); },
+            addMinutes: function (m) { return new Date(Date.now() + m * 60000); },
+            addHours: function (h) { return new Date(Date.now() + h * 60 * 60000); },
+            addDays: function (d) { return new Date(Date.now() + d * 24 * 60 * 60000); },
+            addWeeks: function (w) { return new Date(Date.now() + w * 7 * 24 * 60 * 60000); },
+            addMonths: function (m) { return new Date(Date.now() + m * 30 * 24 * 60 * 60000); },
+            addYears: function (y) { return new Date(Date.now() + y * 365.25 * 24 * 60 * 60000); }
+        };
+
         var moduleInstance = {
 
             config: configuration,
@@ -837,6 +849,7 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
 
             // util
             "formatString": formatString,
+            "time": time, // used for cookie expiration per docs
 
             // reference
             "verbs": verbs,

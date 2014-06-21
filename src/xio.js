@@ -7,7 +7,7 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define('Xio', __xiodependencies, factory);
+        define(__xiodependencies, factory);
     } else {
         // Browser globals
         var globals = this; // window || exports

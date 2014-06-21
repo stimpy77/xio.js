@@ -55,6 +55,12 @@ The key can be a number, or an array of strings or numbers. It will be reformatt
         // when defined, formatted as URL perhaps "/myservice/2/4" or "/myservice.php?x=2&y=4"
     var person = xio.get.mywebservice([2,4])(); // assumes synchronous; see below
 
+The key can also be an object, in which case it will be appended to the URL as querystring data.
+
+    xio.post.mywebservice({a: "b", c: "d"}, { first: "Bob", last: "Blork" }); 
+        // when defined, the route URL is formatted as perhaps "/myservice.php?a=b&c=d"
+        // while the payload is still transmitted in the post
+
 In all cases, you can also use asynchronous invocation.
 
     xio.set.local("mykey", "myvalue");

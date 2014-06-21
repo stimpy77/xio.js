@@ -10,11 +10,11 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         define('Xio', __xiodependencies, factory);
     } else {
         // Browser globals
-        factory($, JSON);
+        var globals = this; // window || exports
+        globals.Xio = factory($, JSON);
     }
 }(function ($, JSON) {
-    var globals = this; // window || exports
-    globals.Xio = function () {
+    function module() {
         if (!$) throw "jQuery must be referenced before xio.js is loaded.";
 
         var configuration = {
@@ -418,8 +418,8 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
                         if (handlers[name]) throw "A " + xverb + " route or action handler named \"" + name + "\" already exists. Use redefine().";
                         retset[verbmember] = handlers[name] = createCustomHandler(xverb, custom[v], options);
 
-                        if (!_module[verbmember] && customverbs[verbmember]) { // todo: what the heck? directly accessing the output obj!? possible design flaw (but I'm still really not sure I want to return the customverbs obj)
-                            _module[verbmember] = customverbs[verbmember];
+                        if (!moduleInstance[verbmember] && customverbs[verbmember]) { // todo: what the heck? directly accessing the output obj!? possible design flaw (but I'm still really not sure I want to return the customverbs obj)
+                            moduleInstance[verbmember] = customverbs[verbmember];
                         }
                     }
                 }
@@ -820,7 +820,7 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             throw "not implemented (xio.worker): " + typeof (fn);
         }
 
-        var _module = {
+        var moduleInstance = {
 
             config: configuration,
              
@@ -850,8 +850,10 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             // web worker
             "worker": worker
         };
-        return _module;
+        return moduleInstance;
     };
+
+    return module;
 
 }).apply(this, __xiodependencies));
 __xiodependencies = undefined; // cleanup

@@ -4,7 +4,15 @@
 // send feedback to jon@jondavis.net
 
 var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
-(function ($, JSON) {
+(function (factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define('Xio', __xiodependencies, factory);
+    } else {
+        // Browser globals
+        factory($, JSON);
+    }
+}(function ($, JSON) {
     var globals = this; // window || exports
     globals.Xio = function () {
         if (!$) throw "jQuery must be referenced before xio.js is loaded.";
@@ -845,5 +853,5 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         return _module;
     };
 
-}).apply(this, __xiodependencies);
+}).apply(this, __xiodependencies));
 __xiodependencies = undefined; // cleanup

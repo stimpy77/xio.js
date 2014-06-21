@@ -20,68 +20,6 @@ describe("xio", function() {
 
     ////////////////////////////////////////////////////////////////////////
     
-    describe("xio.time", function () {
-
-        /*
-var expires = xio.time.addSeconds(30); // 30 seconds from now
-var expires = xio.time.addMinutes(10); // ten minutes from now
-var expires = xio.time.addHours(4); // four hours from now
-var expires = xio.time.addDays(2); // two days from now
-var expires = xio.time.addWeeks(2); // two weeks from now
-var expires = xio.time.addYears(2); // two years from now
-        */
-
-        it("should return now", function () {
-            var now = xio.time.now();
-            expect(Date.now().valueOf() - now.valueOf()).toBeLessThan(100);
-            expect(Date.now().valueOf() - now.valueOf()).toBeGreaterThan(-1);
-        });
-
-        it("should add seconds", function () {
-            var t = xio.time.addSeconds(3);
-            expect(t.valueOf() - Date.now().valueOf()).toBeLessThan(3100);
-            expect(t.valueOf() - Date.now().valueOf()).toBeGreaterThan(2990);
-        });
-
-        it("should add minutes", function () {
-            var t = xio.time.addMinutes(3);
-            expect(t.valueOf() - Date.now().valueOf()).toBeLessThan(3.1 * 60 * 1000);
-            expect(t.valueOf() - Date.now().valueOf()).toBeGreaterThan(2.9 * 60 * 1000);
-        });
-
-        it("should add hours", function () {
-            var t = xio.time.addHours(3);
-            expect(t.valueOf() - Date.now().valueOf()).toBeLessThan(3.1 * 60 * 60 * 1000);
-            expect(t.valueOf() - Date.now().valueOf()).toBeGreaterThan(2.9 * 60 * 60 * 1000);
-        });
-
-        it("should add days", function () {
-            var t = xio.time.addDays(3);
-            expect(t.valueOf() - Date.now().valueOf()).toBeLessThan(3.1 * 24 * 60 * 60 * 1000);
-            expect(t.valueOf() - Date.now().valueOf()).toBeGreaterThan(2.9 * 24 * 60 * 60 * 1000);
-        });
-
-        it("should add weeks", function () {
-            var t = xio.time.addWeeks(3);
-            expect(t.valueOf() - Date.now().valueOf()).toBeLessThan(3.1 * 7 * 24 * 60 * 60 * 1000);
-            expect(t.valueOf() - Date.now().valueOf()).toBeGreaterThan(2.9 * 7 * 24 * 60 * 60 * 1000);
-        });
-
-        it("should add months", function () {
-            var t = xio.time.addMonths(3);
-            expect(t.valueOf() - Date.now().valueOf()).toBeLessThan(3.1 * 30 * 24 * 60 * 60 * 1000);
-            expect(t.valueOf() - Date.now().valueOf()).toBeGreaterThan(2.9 * 30 * 24 * 60 * 60 * 1000);
-        });
-
-        it("should add years", function () {
-            var t = xio.time.addYears(3);
-            expect(t.valueOf() - Date.now().valueOf()).toBeLessThan(3.1 * 365.25 * 24 * 60 * 60 * 1000);
-            expect(t.valueOf() - Date.now().valueOf()).toBeGreaterThan(2.9 * 365.25 * 24 * 60 * 60 * 1000);
-        });
-    });
-
-    ////////////////////////////////////////////////////////////////////////
-
     describe("localstorage", function() {
 
         describe("xio.put.local(k,v)", function() {
@@ -740,6 +678,47 @@ var expires = xio.time.addYears(2); // two years from now
                     expect(result).not.toBe("error");
                     state = "fail";
                 });
+
+                waitsFor(function () {
+                    return state !== undefined;
+                }, "unknown failure (timeout)", 500);
+            });
+
+            it("should post string to a route with using null options and success/error params", function () {
+                var v = xio.verbs;
+                xio.define("nestedpostsuccess", {
+                    url: "spec/svr/KeyValueStore/{0}",
+                    methods: [v.get, v.post],
+                    async: false // synchronous
+                });
+                var key = "post1";
+                var value = "val1";
+                var result;
+                var state;
+                var success = function (retval) {
+                    $.getJSON("spec/svr/KeyValueStore/" + key, function (v) {
+                        result = v;
+                        expect(result).toBe(value);
+                        state = "success";
+
+                        // cleanup
+                        $.ajax("spec/svr/KeyValueStore/" + key + "?method=DELETE", {
+                            type: "DELETE"
+                        });
+                    }).fail(function () {
+                        result = "error";
+                        expect(result).not.toBe("error");
+                        state = "fail";
+                    });
+
+                };
+                var fail = function (error) {
+                    result = "error";
+                    expect(result).not.toBe("error");
+                    state = "fail";
+                };
+                //debugger;
+                xio.post.nestedpostsuccess(key, value, null, success, fail);
 
                 waitsFor(function () {
                     return state !== undefined;

@@ -1,6 +1,6 @@
 // xio.js
 // http://github.com/stimpy77/xio.js
-// version 0.1.4
+// version 0.1.5
 // send feedback to jon@jondavis.net
 
 var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
@@ -443,21 +443,24 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             }
 
             else {
-                verb = verb.toLowerCase();
-                if (!verbs[verb] || !verbHandles[verb]) throw "Verb not supported: " + verb;
-                var handleset = {};
-                for (var v in verbs) {
-                    if (verbHandles[v] && verbHandles[v][definition_name]) {
-                        handleset[v] = verbHandles[v][definition_name];
+                if ($.type(verb) != 'array') verb = [verb];
+                for (var item in verb) {
+                    var verbitem = verb[item];
+                    verbitem = verbitem.toLowerCase();
+                    if (!verbs[verbitem] || !verbHandles[verbitem]) throw "Verb not supported: " + verbitem;
+                    var handleset = {};
+                    for (var v in verbs) {
+                        if (verbHandles[v] && verbHandles[v][definition_name]) {
+                            handleset[v] = verbHandles[v][definition_name];
+                        }
                     }
-                }
-                if (typeof (implementation) == "function") {
-                    var options = arguments.length > 3 ? arguments[3] : null;
-                    handleset[verb] = verbHandles[verb][definition_name] = createCustomHandler(verb, implementation, options);
-                    return handleset;
-                }
-                else {
-                    throw "implementation argument must be a function if a verb is specified"
+                    if (typeof (implementation) == "function") {
+                        var options = arguments.length > 3 ? arguments[3] : null;
+                        handleset[verbitem] = verbHandles[verbitem][definition_name] = createCustomHandler(verbitem, implementation, options);
+                        return handleset;
+                    } else {
+                        throw "implementation argument must be a function if a verb is specified"
+                    }
                 }
             }
         }
@@ -588,31 +591,27 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         }
 
         function cascadeargs() {
-            var ret = {};
-            //argsarray => kvp {arg, array => value, "types"}
             var skip = 0;
-            for (var a in arguments) {
-                var def = arguments[a];
-                var name, curs;
-                for (var n in arguments[a]) {
-                    if (def.hasOwnProperty(n)) name = n;
+            var ret = {};
+            
+            //for (var i in arguments) {
+            for (var i=0; i < arguments.length; i++) {
+                var parameterName, value, types;
+                for (var key in arguments[i - skip]) {
+                    value = arguments[i - skip][key][0];
                 }
-                for (var n in arguments[a-skip]) {
-                    if (arguments[a-skip].hasOwnProperty(n)) curs = n;
+                for (var k in arguments[i]) {
+                    parameterName = k;
+                    types = arguments[i][k][1].split('|');
                 }
-                var value = arguments[a-skip][curs][0];
-                if (def === undefined || def === null) continue;
-                var types = def[name][1].split('|');
-                var matchtype = false;
-                for (var t in types) {
-                    if ($.type(value) == types[t]) {
-                        matchtype = true;
-                    }
+                if (value === null || value === undefined) {
+                    continue;
                 }
-                if (matchtype) {
-                    ret[name] = value;
+                if (types.indexOf($.type(value)) == -1) {
+                    skip++;
+                    continue;
                 }
-                else skip++;
+                ret[parameterName] = value;
             }
             return ret;
         }
@@ -630,7 +629,6 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         function createRoutedHandler(verb, options) {
 
             return function (key, data, invokeoptions, successfn, errorfn) {
-
                 var args = cascadeargs(
                     { key: [key, "string|number|array"] },
                     { data: [data, "string|number|object"] },
@@ -801,17 +799,6 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             }
             throw "not implemented (xio.worker): " + typeof (fn);
         }
-        
-        var time = {
-            now: Date.now,
-            addSeconds: function (s) { return new Date(Date.now() + s * 1000) },
-            addMinutes: function (m) { return new Date(Date.now() + m * 60000) },
-            addHours: function (h) { return new Date(Date.now() + h * 60 * 60000) },
-            addDays: function (d) { return new Date(Date.now() + d * 24 * 60 * 60000) },
-            addWeeks: function (w) { return new Date(Date.now() + w * 7 * 24 * 60 * 60000) },
-            addMonths: function(m) { return  new Date(Date.now() + m * 30 * 24 * 60 * 60000)},
-            addYears: function (y) { return new Date(Date.now() + y * 365.25 * 24 * 60 * 60000) }
-        };
 
         var _module = {
 
@@ -830,7 +817,6 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
 
             // util
             "formatString": formatString,
-            "time": time,
 
             // reference
             "verbs": verbs,

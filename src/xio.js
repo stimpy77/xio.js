@@ -636,8 +636,8 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
                     { successfn: [successfn, "function"] },
                     { errorfn: [errorfn, "function"] });
                 key = args.key, data = args.data, invokeoptions = args.invokeoptions, successfn = args.successfn, errorfn = args.errorfn;
-
-                var opts = mergeNewInto(invokeoptions, options);
+                var asyncopts = mergeNewInto({ async: options.async === undefined ? true : options.async }, options);
+                var opts = mergeNewInto(invokeoptions, asyncopts);
                 var url = opts.url;
                 var args = [url];
                 if (key === null || typeof (key) == "string" || typeof (key) == "number") args.push(key);
@@ -803,7 +803,7 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
         var _module = {
 
             config: configuration,
-
+             
             // verb implementations
             "get": getDefinitions,
             "post": postDefinitions,

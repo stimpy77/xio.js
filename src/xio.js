@@ -621,7 +621,7 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
             o2 = o2 || {};
             var ret = {};
             for (var p in o2) {
-                ret[p] = o1[p] ? o1[p] : o2[p]
+                ret[p] = o1[p] !== undefined ? o1[p] : o2[p];
             };
             return ret;
         }

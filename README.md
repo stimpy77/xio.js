@@ -24,6 +24,12 @@ To write and read to and from a session cookie,
 
 To write and read to and from a web service (as optionally synchronous; see below),
 
+    var mywebservice = xio.define("mywebservice", {
+        url: "/myurl/{0}", // {0} is a format placeholder for the key 
+        methods: [ xio.verbs.get, xio.verbs.post },
+        async: true
+    });
+    // ...
     xio.post.mywebservice("mykey", "myvalue");
     var person = xio.get.mywebservice("mykey")();
 

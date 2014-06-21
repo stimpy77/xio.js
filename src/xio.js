@@ -628,9 +628,9 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
 
         function createRoutedHandler(verb, options) {
 
-            return function (key, data, invokeoptions, successfn, errorfn) {
+            function routedHandler (key, data, invokeoptions, successfn, errorfn) {
                 var args = cascadeargs(
-                    { key: [key, "string|number|array"] },
+                    { key: [key, "string|number|array|object"] },
                     { data: [data, "string|number|object"] },
                     { invokeoptions: [invokeoptions, "object"] },
                     { successfn: [successfn, "function"] },
@@ -639,12 +639,23 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
                 var asyncopts = mergeNewInto({ async: options.async === undefined ? true : options.async }, options);
                 var opts = mergeNewInto(invokeoptions, asyncopts);
                 var url = opts.url;
-                var args = [url];
-                if (key === null || typeof (key) == "string" || typeof (key) == "number") args.push(key);
-                else { // assume array of composite key items for formatter
-                    for (var i in key) args.push(key[i]);
+                var urlargs = [url];
+                var qs = $.type(key) == 'object' ? key : null;
+                if (key === null || typeof (key) == "string" || typeof (key) == "number") urlargs.push(key);
+                else if ($.type(key) == "array") { // assume array of composite key items for formatter
+                    for (var i in key) urlargs.push(key[i]);
                 }
-                url = formatString.apply(null, args);
+                url = formatString.apply(null, urlargs);
+
+                // querystring support -- if first param is an object it is added to querystring
+                if ($.type(key) == 'object') {
+                    for (var k in key) {
+                        if (key.hasOwnProperty(k)) {
+                            url += (url.indexOf('?') == -1 ? '?' : '&') + encodeURI(k) + '=' + encodeURI(key[k]);
+                        }
+                    }
+                }
+
                 var method = verb;
 
                 
@@ -668,6 +679,7 @@ var __xiodependencies = [jQuery, JSON]; // args list for IIFE on next line
                 if (errorfn) ret.error(errorfn);
                 return ret;
             };
+            return routedHandler;
         }
 
         function worker(fn, receivefn, successfn, errorfn, completefn) {

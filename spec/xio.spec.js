@@ -609,6 +609,31 @@ describe("xio", function() {
                 });
             });
 
+            describe("querystring request", function () {
+
+                it("should return data from a route", function () {
+                    var v = xio.verbs;
+                    xio.define("multiparamqs", {
+                        url: "spec/svr/MultiParamQS",
+                        methods: [v.get],
+                        async: false // synchronous
+                    });
+                    var compositeKey = {a: "b", c: "d"};
+                    var result;
+                    xio.get.multiparamqs(compositeKey).success(function (retval) {
+                        result = retval;
+                    })
+                    .error(function (error) {
+                        result = "error";
+                    })
+                    .complete(function () {
+                        expect(result).not.toBeFalsy();
+                        expect(result.a).toBe("b");
+                        expect(result.c).toBe("d");
+                    });
+                });
+            });
+
             
             describe("cached", function () {
 

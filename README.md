@@ -58,8 +58,8 @@ The key can be a number, or an array of strings or numbers. It will be reformatt
 The key can also be an object, in which case it will be appended to the URL as querystring data.
 
     xio.post.mywebservice({a: "b", c: "d"}, { first: "Bob", last: "Blork" }); 
-        // when defined, the route URL is formatted as perhaps "/myservice.php?a=b&c=d"
-        // while the payload is still transmitted in the post
+        // First param is a querystring data object, so the route URL is formatted as
+        // perhaps "/myservice.php?a=b&c=d" while the payload is still transmitted in the post
 
 In all cases, you can also use asynchronous invocation.
 

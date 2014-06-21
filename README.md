@@ -1,6 +1,6 @@
 XIO (xio.js)
 ======
-version 0.1.4 (all 63-or-so spec tests pass)
+version 0.1.5 (all 65-or-so spec tests pass)
 
 A consistent data repository strategy for local and remote resources, events, and web workers.
 
@@ -316,7 +316,7 @@ As a convenience, you can generate an expiration date with:
 
 The `define()` function creates a verb handler or route.
 
-The `url` property is an expression that is formatted with the `key` parameter of any XHR-based CRUD operation. The `key` parameter can be a string (or number) or an array of strings (or numbers, which are convertible to strings). This value will be applied to the `url` property using the same convention as the typical string formatters in other languages such as C#'s `string.Format()`.
+The `url` property is an expression that is formatted with the `key` parameter of any XHR-based CRUD operation. The `key` parameter can be a string (or number), an array of strings (or numbers, which are convertible to strings), or an object that would be directly added to a querystring. This value will be merged with the `url` property using the same convention as the typical string formatters in other languages such as C#'s `string.Format()`; in the case of the key parameter being an object, it will add or append the querystring.
 
 Where the `methods` property is defined as an array of "GET", "POST", etc, for each one mapping to standard XIO verbs an XHR route will be internally created on behalf of the rest of the options defined in the options object that is passed in as a parameter to `define()`. The return value of `define()` is an object that lists all of the various operations that were wrapped for XIO (i.e. `get()`, `post()`, etc).
 

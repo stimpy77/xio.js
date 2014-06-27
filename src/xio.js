@@ -64,7 +64,8 @@ where such changes and/or additions to the Program originate from and are distri
 
         var configuration = Object.create(module.config = {
             cacheInvalidateTrackingStore: 'session',
-            parentDirectory: "src/"
+            parentDirectory: "src/",
+            debug: false
         });
 
         function formatKey(key) {
@@ -835,7 +836,7 @@ where such changes and/or additions to the Program originate from and are distri
                     }
                 };
                 var workerbody = "self.onmessage = " + onmessage.toString() + "\n"
-                    + "var __xiodebug = " + Xio.debug + ";"
+                    + "var __xiodebug = " + configuration.debug + ";"
                     + "var emit = function() { postMessage.apply(this, arguments) };"
                     + "var console = { log: function (msg) { emit({ \"console.log\": msg }); } };\n"
                     + "var start=" + startfn.toString().replace(/\"fn\"/, userpayload + ".call(this, arguments);");

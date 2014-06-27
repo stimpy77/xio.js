@@ -62,10 +62,10 @@ where such changes and/or additions to the Program originate from and are distri
     function module() {
         if (!$) throw "jQuery must be referenced before xio.js is loaded.";
 
-        var configuration = {
+        var configuration = Object.create(module.config = {
             cacheInvalidateTrackingStore: 'session',
             parentDirectory: "src/"
-        };
+        });
 
         function formatKey(key) {
             if ($.type(key) == "array") {

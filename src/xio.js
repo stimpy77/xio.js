@@ -121,8 +121,8 @@ where such changes and/or additions to the Program originate from and are distri
         function patchData(unparsed, patchdata, preparsed) {
             var data = unparsed;
             if (data && !preparsed && (
-                (data.indexOf("{") == 0 && data.indexOf("}") == data.length - 1) ||
-                (data.indexOf("[") == 0 && data.indexOf("]") == data.length - 1))) {
+                (data.indexOf("{") == 0 && data.lastIndexOf("}") == data.length - 1) ||
+                (data.indexOf("[") == 0 && data.lastIndexOf("]") == data.length - 1))) {
                 try {
                     data = parseJSON(data);
                 } catch (error) { }

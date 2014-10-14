@@ -603,3 +603,4 @@ I have added Web Workers, and for this feature the next need is to wrap "postMes
 
 If you run the Jasmine tests, make sure the .json file type is set up as a mime type. For example, IIS and IIS Express will return a 403 otherwise. Google reveals this: http://michaellhayden.blogspot.com/2012/07/add-json-mime-type-to-iis-express.html
 
+<a href='https://pledgie.com/campaigns/27054'><img alt='Click here to lend your support to: yay pay me and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/27054.png?skin_name=chrome' border='0' ></a>

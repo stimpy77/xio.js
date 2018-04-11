@@ -26,7 +26,7 @@ To write and read to and from a web service (as optionally synchronous; see belo
 
     var mywebservice = xio.define("mywebservice", {
         url: "/myurl/{0}", // {0} is a format placeholder for the key 
-        methods: [ xio.verbs.get, xio.verbs.post },
+        methods: [ xio.verbs.get, xio.verbs.post ],
         async: true
     });
     // ...
